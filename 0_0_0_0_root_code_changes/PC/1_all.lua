@@ -158,11 +158,11 @@ local function checkPcForId19(valueidcheck)
     return foundId19
 end
 
-
-
+my_self_id = tostring(os.getComputerID())
 function get_info()
     while true do
-        local senderId, message, broadcast = rednet.receive('find_me',30)
+        local skipProcessing = false
+        local senderId, message, broadcast = rednet.receive('find_me',5)
             if not senderId then
                 local stateData = readStateFromFile()
                 local dataToSend = textutils.serialize(stateData)
@@ -172,18 +172,26 @@ function get_info()
                 term.setCursorPos(1,1)
                 print("No new entries")
             else
+                local receivedData = textutils.unserialize(message)
+                if receivedData.my_id == my_self_id  then
+                    term.clear()
+                    term.setCursorPos(1,1)
+                    print("No new messages")
+                    skipProcessing = true
+                    sleep(3)
+                end
+                if not skipProcessing then
             local i_found_u = checkPcForId19(senderId)
                 if i_found_u then
                     rednet.broadcast(message,'find_me')
                     term.clear()
                     term.setCursorPos(1,1)
                     print("Entry found passing on")
-                    sleep(31)
+                    sleep(1)
                 else
                     local receivedData = textutils.unserialize(message)
                     updatePcTable(tostring(senderId), receivedData)
                     local stateData = readStateFromFile()
-                    -- Format the state data into a string for sending
                     local dataToSend = textutils.serialize(stateData)
                     sleep(2)
                     rednet.send(senderId, dataToSend, 'find_me')
@@ -192,6 +200,7 @@ function get_info()
                     print("New Entry Found")
                 end
             end
+        end
     end
 end
 
