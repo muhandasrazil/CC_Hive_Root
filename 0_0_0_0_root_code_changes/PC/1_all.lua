@@ -30,7 +30,6 @@ local function readCurrentPcData()
     local path = "CompData"
     local file = fs.open(path, "r")
     local currentData = { pc = {} }
-
     if file then
         local content = file.readAll()
         file.close()
@@ -41,7 +40,6 @@ local function readCurrentPcData()
             end
         end
     end
-
     return currentData
 end
 local function writeToPcTable(stateData, pcId)
@@ -113,12 +111,61 @@ local function isSenderIdInPcTable(senderId)
     end
     return false
 end
+local function updatePcTable(stateData, pcId)
+    local path = "CompData"
+    local file = fs.open(path, "r")
+    local lines = {}
+    local updated = false
+    if file then
+        local line = file.readLine()
+        while line do
+            if line:match("^%s*%[" .. pcId .. "%]") then
+                local newData = "    [" .. pcId .. "] = {"
+                for key, value in pairs(stateData) do
+                    newData = newData .. key .. " = " .. value .. ", "
+                end
+                newData = newData .. "},"
+                line = newData
+                updated = true
+            end
+            table.insert(lines, line)
+            line = file.readLine()
+        end
+        file.close()
+    end
+    if updated then
+        local file = fs.open(path, "w")
+        if file then
+            for _, line in ipairs(lines) do
+                file.writeLine(line)
+            end
+            file.close()
+        else
+            print("Error: Unable to write to CompData file.")
+        end
+    end
+end
+local function processFindMeData(senderId, receivedData)
+    if isSenderIdInPcTable(senderId) then
+        print("Known sender ID: " .. senderId .. ", updating...")
+        updatePcTable(receivedData, senderId)
+    else
+        print("Unknown sender ID: " .. senderId .. ", adding new entry...")
+        writeToPcTable(receivedData, senderId)
+    end
+end
 function waitForWakeUp()
     while true do
         local senderId, message, protocol = rednet.receive('wake_up')
         if message == 'wake_up' then
             print("Received wake_up message. Restarting get_info loop.")
             get_info()
+        elseif message == 'update_me' then
+            local id2, receivedData, protocol2 = rednet.receive('find_me')
+            if receivedData then
+                processFindMeData(senderId, receivedData)
+            end
+        else
         end
     end
 end
