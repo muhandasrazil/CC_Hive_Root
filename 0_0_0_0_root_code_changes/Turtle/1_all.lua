@@ -1,207 +1,187 @@
-function processFile()
+local function readStateData()
     local path = "state.lua"
     local file = fs.open(path, "r")
-    local content = file.readAll()
-    file.close()
-
-    -- Perform replacements
-    content = content:gsub("''", "'")
-    content = content:gsub("'{", "{")
-    content = content:gsub("}'", "}")
-
-    -- Write the updated content back to the file
-    file = fs.open(path, "w")
-    file.write(content)
-    file.close()
-end
--- Custom function to format table entries appropriately for Lua
-local function customSerialize(table)
-    local str = "{"
-    for k, v in pairs(table) do
-        if type(v) == "table" then
-            v = customSerialize(v)  -- Recursive call for nested tables
-        elseif type(v) == "string" then
-            -- Add single quotes only if the string contains spaces or non-word characters
-            if v:match("[^%w_]") then
-                v = "'" .. v .. "'"  -- Enclose in single quotes
-            end
-        elseif type(v) == "boolean" or type(v) == "number" then
-            v = tostring(v)  -- Handle booleans and numbers as plain text
-        end
-        str = str .. k .. " = " .. v .. ", "
-    end
-    str = str:sub(1, -3)  -- Remove the last comma and space
-    str = str .. "}"
-    return str
-end
-
--- Function to parse the state.lua file to find the pc table's position
-local function parseStateFile()
-    local path = "state.lua"
-    local file = fs.open(path, "r")
-    local lines = {}
-    local pcTableExists = false
-    local pcTableStartIndex, pcTableEndIndex = nil, nil
-
-    if file then
-        while true do
-            local line = file.readLine()
-            if line == nil then break end
-            table.insert(lines, line)
-
-            if line:match("^pc = {") then
-                pcTableExists = true
-                pcTableStartIndex = #lines
-            elseif line:match("^}") and pcTableExists and not pcTableEndIndex then
-                pcTableEndIndex = #lines
-            end
-        end
-        file.close()
-    else
-        print("Error: Unable to open the state file for reading.")
-    end
-
-    return lines, pcTableExists, pcTableStartIndex, pcTableEndIndex
-end
-
--- Function to update the pc table in state.lua
-local function updatePcTable(senderId, receivedData)
-    local lines, pcExists, startIndex, endIndex = parseStateFile()
-    local formattedData = customSerialize(receivedData)
-    local found = false
-
-    if pcExists then
-        for i = startIndex + 1, endIndex - 1 do
-            if lines[i]:match("%[" .. senderId .. "%]") then
-                found = true
-                break
-            end
-        end
-
-        if not found then
-            table.insert(lines, endIndex, "    [" .. senderId .. "] = " .. formattedData .. ",")
-            local file = fs.open("state.lua", "w")
-            if file then
-                for _, line in ipairs(lines) do
-                    file.writeLine(line)
-                end
-                file.close()
-            else
-                print("Error: Unable to open the state file for writing.")
-            end
-        end
-    else
-        print("pc table does not exist in the file.")
-    end
-    processFile()
-end
-
--- Function to parse lines and convert to table format
-local function parseToTable(line)
-    local key, value = line:match("^([%w_]+) = (.+)$")
-    if key and value then
-        if value:match("^%{.-%}$") or value:match("^'.-'$") or value:match("^%d+$") or value == "true" or value == "false" then
-            return key, value
-        else
-            return key, "'" .. value .. "'"
-        end
-    end
-    return nil
-end
-
--- Function to read state from state.lua
-local function readStateFromFile()
-    local path = "state.lua"
-    local file = fs.open(path, "r")
+    local readData = false
     local stateData = {}
-
     if file then
-        local startProcessing = false
         while true do
             local line = file.readLine()
             if line == nil then break end
-            if startProcessing then
-                local key, value = parseToTable(line)
-                if key then
-                    stateData[key] = value
+            if readData then
+                local key, value = line:match("^([%w_]+) = (.+)$")
+                if key and value then
+                    if value:match("^%{.-%}$") or value:match("^'.-'$") or value:match("^%d+$") or value == "true" or value == "false" then
+                        stateData[key] = value
+                    else
+                        stateData[key] = "'" .. value .. "'"
+                    end
                 end
             elseif line:match("^flag = true$") then
-                startProcessing = true
+                readData = true
             end
         end
         file.close()
-        return stateData
     else
         print("Error: Unable to read state file.")
-        return nil
+    end
+    return stateData
+end
+local function readCurrentPcData()
+    local path = "CompData"
+    local file = fs.open(path, "r")
+    local currentData = { pc = {} }
+
+    if file then
+        local content = file.readAll()
+        file.close()
+        if content and #content > 0 then
+            local deserializedData = textutils.unserialize(content)
+            if deserializedData and deserializedData.pc then
+                currentData = deserializedData
+            end
+        end
+    end
+
+    return currentData
+end
+local function writeToPcTable(stateData, pcId)
+    local path = "CompData"
+    local file = fs.open(path, "r")
+    local lines = {}
+    local foundNewLine = false
+    if file then
+        local index = 0
+        local line = file.readLine()
+        while line do
+            index = index + 1
+            if line:match("newLineStart") then
+                foundNewLine = true
+                local insertData = "    [" .. pcId .. "] = {"
+                for key, value in pairs(stateData) do
+                    insertData = insertData .. key .. " = " .. value .. ", "
+                end
+                insertData = insertData .. "},"
+                lines[index] = insertData
+                table.insert(lines, index + 1, "    newLineStart")
+                index = index + 1
+            else
+                lines[index] = line
+            end
+            line = file.readLine()
+        end
+        file.close()
+    end
+    if not foundNewLine then
+        lines[#lines + 1] = "    [" .. pcId .. "] = {"
+        for key, value in pairs(stateData) do
+            lines[#lines + 1] = key .. " = " .. value .. ", "
+        end
+        lines[#lines + 1] = "},"
+        lines[#lines + 1] = "    newLineStart"
+    end
+    file = fs.open(path, "w")
+    if file then
+        for _, line in ipairs(lines) do
+            file.writeLine(line)
+        end
+        file.close()
+    else
+        print("Error: Unable to write to CompData file.")
     end
 end
-local function checkPcForId19(valueidcheck)
-    local path = "state.lua"
+local function broadcastData(stateData)
+    local serializedData = textutils.serialize(stateData)
+    rednet.broadcast(serializedData, 'find_me')
+    print("Broadcasted: " .. serializedData)
+end
+local function isSenderIdInPcTable(senderId)
+    local path = "CompData"
     local file = fs.open(path, "r")
-    local pcTableExists = false
-    local foundId19 = false
+    local senderIdNum = tonumber(senderId)
     if file then
         while true do
             local line = file.readLine()
-            if line == nil then break end
-            if line:match("^pc = {") then
-                pcTableExists = true
-            elseif line:match("^}") and pcTableExists then
-                break
-            elseif pcTableExists and line:match("%["..valueidcheck.."%]") then
-                foundId19 = true
+            if not line then break end
+            if line:match("%[" .. senderIdNum .. "%]") then
+                file.close()
+                return true
             end
         end
         file.close()
+    else
+        print("Error: Unable to open CompData file for reading.")
     end
-    return foundId19
+    return false
 end
-
-my_self_id = tostring(os.getComputerID())
-function get_info()
+function waitForWakeUp()
     while true do
-        local skipProcessing = false
-        local senderId, message, broadcast = rednet.receive('find_me',5)
-            if not senderId then
-                local stateData = readStateFromFile()
-                local dataToSend = textutils.serialize(stateData)
-                sleep(1)
-                rednet.broadcast(dataToSend, 'find_me')
-                term.clear()
-                term.setCursorPos(1,1)
-                print("No new entries")
-            else
-                local receivedData = textutils.unserialize(message)
-                if receivedData.my_id == my_self_id  then
-                    term.clear()
-                    term.setCursorPos(1,1)
-                    print("No new messages")
-                    skipProcessing = true
-                    sleep(3)
-                end
-                if not skipProcessing then
-            local i_found_u = checkPcForId19(senderId)
-                if i_found_u then
-                    rednet.broadcast(message,'find_me')
-                    term.clear()
-                    term.setCursorPos(1,1)
-                    print("Entry found passing on")
-                    sleep(1)
-                else
-                    local receivedData = textutils.unserialize(message)
-                    updatePcTable(tostring(senderId), receivedData)
-                    local stateData = readStateFromFile()
-                    local dataToSend = textutils.serialize(stateData)
-                    sleep(2)
-                    rednet.send(senderId, dataToSend, 'find_me')
-                    term.clear()
-                    term.setCursorPos(1,1)
-                    print("New Entry Found")
-                end
-            end
+        local senderId, message, protocol = rednet.receive('wake_up')
+        if message == 'wake_up' then
+            print("Received wake_up message. Restarting get_info loop.")
+            get_info()
         end
     end
 end
-
+local my_self_id = tostring(os.getComputerID())
+function get_info()
+    timeout_count = 0
+    local increment_counter = 3
+    while timeout_count < increment_counter do
+        local senderId, message, protocol = rednet.receive('find_me', 2)
+        if not senderId then
+            print("Timeout " .. timeout_count)
+            if timeout_count >= increment_counter then
+                print("now waiting for new responses")
+                break
+            end
+            broadcastOwnState()
+            timeout_count = timeout_count + 1
+        else
+            local receivedData = textutils.unserialize(message)
+            if receivedData.my_id == my_self_id then
+                print("Ignoring own broadcast")
+            else
+                term.clear()
+                term.setCursorPos(1,1)
+                print("Timeout " .. timeout_count)
+                handleReceivedData(senderId, receivedData)
+            end
+        end
+    end
+    term.clear()
+    term.setCursorPos(1,1)
+    print("now waiting for new responses")
+end
+function broadcastOwnState()
+    local stateData = readStateData()
+    local dataToSend = textutils.serialize(stateData)
+    rednet.broadcast(dataToSend, 'find_me')
+end
+function handleReceivedData(senderId, receivedData)
+    if isSenderIdInPcTable(senderId) then
+        print("Known sender ID: " .. senderId .. ", forwarding...")
+        forwardToOthers(senderId, receivedData)
+    else
+        print("Unknown sender ID: " .. senderId .. ", adding new entry...")
+        writeToPcTable(receivedData, senderId)
+        timeout_count = 0
+    end
+end
+function forwardToOthers(senderId, data)
+    local dataToSend = textutils.serialize(data)
+    for id in pairs(readCurrentPcData().pc) do
+        if id ~= senderId and id ~= my_self_id then
+            rednet.send(tonumber(id), dataToSend, 'find_me')
+            print("Forwarding to ID: " .. id)
+        end
+    end
+end
+if not isSenderIdInPcTable(my_self_id) then
+    local stateData = readStateData()
+    writeToPcTable(stateData, stateData.my_id)
+    rednet.broadcast('wake_up','wake_up')
+    sleep(0.5)
+    broadcastData(stateData)
+end
 get_info()
+waitForWakeUp()
