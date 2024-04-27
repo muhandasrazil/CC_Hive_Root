@@ -1,5 +1,5 @@
 local function readStateData()
-    local path = "state.lua"
+    local path = "state"
     local file = fs.open(path, "r")
     local readData = false
     local stateData = {}

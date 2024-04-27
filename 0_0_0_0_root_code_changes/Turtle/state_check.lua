@@ -20,7 +20,7 @@ who_am_i = {
     end
 
 function saveState(stateKey, newValue)
-    local filename = "/state.lua"
+    local filename = "/state"
     local lines = {}
     local found = false
     local file = fs.open(filename, "r")

@@ -15,9 +15,9 @@ if fs.exists('/apis') then
 end
 fs.makeDir('/apis')
 --fs.copy('/network.lua', '/apis/network')
-fs.copy('/state.lua', '/apis/state')
+--fs.copy('/state.lua', '/apis/state')
 --os.loadAPI('/apis/network')
-os.loadAPI('/apis/state')
+--os.loadAPI('/apis/state')
 
 
 -- OPEN REDNET
