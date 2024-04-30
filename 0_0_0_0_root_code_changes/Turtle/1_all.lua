@@ -1,161 +1,7 @@
-local function readStateData()
-    local path = "state"
-    local file = fs.open(path, "r")
-    local readData = false
-    local stateData = {}
-    if file then
-        while true do
-            local line = file.readLine()
-            if line == nil then break end
-            if readData then
-                local key, value = line:match("^([%w_]+) = (.+)$")
-                if key and value then
-                    if value:match("^%{.-%}$") or value:match("^'.-'$") or value:match("^%d+$") or value == "true" or value == "false" then
-                        stateData[key] = value
-                    else
-                        stateData[key] = "'" .. value .. "'"
-                    end
-                end
-            elseif line:match("^flag = true$") then
-                readData = true
-            end
-        end
-        file.close()
-    else
-        print("Error: Unable to read state file.")
-    end
-    return stateData
-end
-local function readCurrentPcData()
-    local path = "CompData"
-    local file = fs.open(path, "r")
-    local currentData = { pc = {} }
-    if file then
-        local content = file.readAll()
-        file.close()
-        if content and #content > 0 then
-            local deserializedData = textutils.unserialize(content)
-            if deserializedData and deserializedData.pc then
-                currentData = deserializedData
-            end
-        end
-    end
-    return currentData
-end
-local function writeToPcTable(stateData, pcId)
-    local path = "CompData"
-    local file = fs.open(path, "r")
-    local lines = {}
-    local foundNewLine = false
-    if file then
-        local index = 0
-        local line = file.readLine()
-        while line do
-            index = index + 1
-            if line:match("newLineStart") then
-                foundNewLine = true
-                local insertData = "    [" .. pcId .. "] = {"
-                for key, value in pairs(stateData) do
-                    insertData = insertData .. key .. " = " .. value .. ", "
-                end
-                insertData = insertData .. "},"
-                lines[index] = insertData
-                table.insert(lines, index + 1, "    newLineStart")
-                index = index + 1
-            else
-                lines[index] = line
-            end
-            line = file.readLine()
-        end
-        file.close()
-    end
-    if not foundNewLine then
-        lines[#lines + 1] = "    [" .. pcId .. "] = {"
-        for key, value in pairs(stateData) do
-            lines[#lines + 1] = key .. " = " .. value .. ", "
-        end
-        lines[#lines + 1] = "},"
-        lines[#lines + 1] = "    newLineStart"
-    end
-    file = fs.open(path, "w")
-    if file then
-        for _, line in ipairs(lines) do
-            file.writeLine(line)
-        end
-        file.close()
-    else
-        print("Error: Unable to write to CompData file.")
-    end
-end
-local function broadcastData(stateData)
-    local serializedData = textutils.serialize(stateData)
-    rednet.broadcast(serializedData, 'find_me')
-    print("Broadcasted: " .. serializedData)
-end
-local function isSenderIdInPcTable(senderId)
-    local path = "CompData"
-    local file = fs.open(path, "r")
-    local senderIdNum = tonumber(senderId)
-    if file then
-        while true do
-            local line = file.readLine()
-            if not line then break end
-            if line:match("%[" .. senderIdNum .. "%]") then
-                file.close()
-                return true
-            end
-        end
-        file.close()
-    else
-        print("Error: Unable to open CompData file for reading.")
-    end
-    return false
-end
-local function updatePcTable(stateData, pcId)
-    local path = "CompData"
-    local file = fs.open(path, "r")
-    local lines = {}
-    local updated = false
-    if file then
-        local line = file.readLine()
-        while line do
-            if line:match("^%s*%[" .. pcId .. "%]") then
-                local newData = "    [" .. pcId .. "] = {"
-                for key, value in pairs(stateData) do
-                    newData = newData .. key .. " = " .. value .. ", "
-                end
-                newData = newData .. "},"
-                line = newData
-                updated = true
-            end
-            table.insert(lines, line)
-            line = file.readLine()
-        end
-        file.close()
-    end
-    if updated then
-        local file = fs.open(path, "w")
-        if file then
-            for _, line in ipairs(lines) do
-                file.writeLine(line)
-            end
-            file.close()
-        else
-            print("Error: Unable to write to CompData file.")
-        end
-    end
-end
-local function processFindMeData(senderId, receivedData)
-    if isSenderIdInPcTable(senderId) then
-        print("Known sender ID: " .. senderId .. ", updating...")
-        updatePcTable(receivedData, senderId)
-    else
-        print("Unknown sender ID: " .. senderId .. ", adding new entry...")
-        writeToPcTable(receivedData, senderId)
-    end
-end
+local my_self_id = tostring(os.getComputerID())
 function waitForWakeUp()
     while true do
+        actions.getAllCompData()
         local senderId, message, protocol = rednet.receive('wake_up')
         if message == 'wake_up' then
             print("Received wake_up message. Restarting get_info loop.")
@@ -163,17 +9,42 @@ function waitForWakeUp()
         elseif message == 'update_me' then
             local id2, receivedData, protocol2 = rednet.receive('find_me')
             if receivedData then
-                processFindMeData(senderId, receivedData)
+                if actions.pcTable[senderId] then
+                    actions.updatePcTable(receivedData,senderId)
+                else
+                    actions.writeToPcTable(receivedData, senderId)
+                end
             end
+        elseif message == 's' then
+            os.shutdown()
+        elseif message == 'r' then
+            os.reboot()
         else
+            print(actions.pcTable[senderId].location.x)
+            print(actions.pcTable[senderId].location.y)
+            print(actions.pcTable[senderId].location.z)
+            if actions.pcTable[senderId].location.x == actions.pcTable[tonumber(my_self_id)].location.x + 1 then
+                orientation = 'east'
+            elseif actions.pcTable[senderId].location.x == actions.pcTable[tonumber(my_self_id)].location.x - 1 then
+                orientation = 'west'
+            elseif actions.pcTable[senderId].location.z == actions.pcTable[tonumber(my_self_id)].location.z + 1 then
+                orientation = 'south'
+            elseif actions.pcTable[senderId].location.z == actions.pcTable[tonumber(my_self_id)].location.z - 1 then
+                orientation = 'north'
+            else
+                orientation = false
+            end
+            actions.updateStateValue("orientation",orientation)
+            actions.updateAndBroadcast()
+            sleep(10)
         end
     end
 end
-local my_self_id = tostring(os.getComputerID())
 function get_info()
     timeout_count = 0
     local increment_counter = 3
     while timeout_count < increment_counter do
+        actions.getAllCompData()
         local senderId, message, protocol = rednet.receive('find_me', 2)
         if not senderId then
             print("Timeout " .. timeout_count)
@@ -181,7 +52,9 @@ function get_info()
                 print("now waiting for new responses")
                 break
             end
-            broadcastOwnState()
+            local stateData = actions.readStateData()
+            local dataToSend = textutils.serialize(stateData)
+            rednet.broadcast(dataToSend, 'find_me')
             timeout_count = timeout_count + 1
         else
             local receivedData = textutils.unserialize(message)
@@ -191,7 +64,19 @@ function get_info()
                 term.clear()
                 term.setCursorPos(1,1)
                 print("Timeout " .. timeout_count)
-                handleReceivedData(senderId, receivedData)
+                if actions.pcTable[senderId] then
+                    print("Known sender ID: " .. senderId .. ", forwarding...")
+                    for id in pairs(actions.readCurrentPcData().pc) do
+                        if id ~= senderId and id ~= my_self_id then
+                            rednet.send(tonumber(id), dataToSend, 'find_me')
+                            print("Forwarding to ID: " .. id)
+                        end
+                    end
+                else
+                    print("Unknown sender ID: " .. senderId .. ", adding new entry...")
+                    actions.writeToPcTable(receivedData, senderId)
+                    timeout_count = 0
+                end
             end
         end
     end
@@ -199,36 +84,14 @@ function get_info()
     term.setCursorPos(1,1)
     print("now waiting for new responses")
 end
-function broadcastOwnState()
-    local stateData = readStateData()
-    local dataToSend = textutils.serialize(stateData)
-    rednet.broadcast(dataToSend, 'find_me')
-end
-function handleReceivedData(senderId, receivedData)
-    if isSenderIdInPcTable(senderId) then
-        print("Known sender ID: " .. senderId .. ", forwarding...")
-        forwardToOthers(senderId, receivedData)
-    else
-        print("Unknown sender ID: " .. senderId .. ", adding new entry...")
-        writeToPcTable(receivedData, senderId)
-        timeout_count = 0
-    end
-end
-function forwardToOthers(senderId, data)
-    local dataToSend = textutils.serialize(data)
-    for id in pairs(readCurrentPcData().pc) do
-        if id ~= senderId and id ~= my_self_id then
-            rednet.send(tonumber(id), dataToSend, 'find_me')
-            print("Forwarding to ID: " .. id)
-        end
-    end
-end
-if not isSenderIdInPcTable(my_self_id) then
-    local stateData = readStateData()
-    writeToPcTable(stateData, stateData.my_id)
+actions.getAllCompData()
+if not actions.pcTable[my_self_id] then
+    local stateData = actions.readStateData()
+    actions.writeToPcTable(stateData, stateData.my_id)
     rednet.broadcast('wake_up','wake_up')
     sleep(0.5)
-    broadcastData(stateData)
+    local dataToSend = textutils.serialize(stateData)
+    rednet.broadcast(dataToSend, 'find_me')
 end
 get_info()
 waitForWakeUp()

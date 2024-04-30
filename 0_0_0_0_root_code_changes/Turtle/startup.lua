@@ -1,46 +1,54 @@
 shell.run("set motd.enable false")
 term.clear()
 term.setCursorPos(1,1)
--- SET LABEL
-os.setComputerLabel('Turtle ' .. os.getComputerID())
-
-local me = os.getComputerID()
+me = os.getComputerID()
+comp_type = 'default'
+if turtle then
+    comp_type = 'Turtle'
+elseif pocket then
+    comp_type = 'Pocket PC'
+elseif commands then
+    comp_type = 'CMD PC'
+else
+    comp_type = 'PC'
+end
+os.setComputerLabel(comp_type .." ".. me)
 sleep((1+me)/10)
-
-shell.run("state_check.lua")
-sleep(1)
---shell.run("who_are_you.lua")
--- INITIALIZE APIS
 if fs.exists('/apis') then
     fs.delete('/apis')
 end
 fs.makeDir('/apis')
---fs.copy('/config.lua', '/apis/config')
---fs.copy('/state.lua', '/apis/state')
---fs.copy('/basics.lua', '/apis/basics')
---fs.copy('/actions.lua', '/apis/actions')
---fs.copy('/network.lua', '/apis/network')
---os.loadAPI('/apis/config')
---os.loadAPI('/apis/state')
---os.loadAPI('/apis/basics')
---os.loadAPI('/apis/actions')
---os.loadAPI('/apis/network')
-
-
--- OPEN REDNET
+fs.copy('/actions.lua', '/apis/actions')
+os.loadAPI('/apis/actions')
 for _, side in pairs({'back', 'top', 'left', 'right'}) do
     if peripheral.getType(side) == 'modem' then
         rednet.open(side)
         break
     end
 end
-
--- LAUNCH PROGRAMS AS SEPARATE THREADS
---multishell.launch({}, '/who_are_you.lua')
---multishell.setTitle(2, 'whoru')
---multishell.launch({}, '/find_me.lua')
---multishell.setTitle(3, 'find_me')
---multishell.launch({}, '/usr_cmd.lua')
---xmultishell.setTitle(3, 'usr_cmd')
+if turtle then
+    actions.who_am_i.trtl = true
+elseif pocket then
+    actions.who_am_i.pckt_cmp = true
+elseif commands then
+    actions.who_am_i.cmd_cmp = true
+else
+    actions.who_am_i.pc_cmp = true
+end
+for key, v in pairs(actions.who_am_i) do
+    actions.updateStateValue(key,v)
+end
+local sx, sy, sz = gps.locate()
+if not sx or not sy or not sz then
+    print("no gps found retaining location info")
+    return false
+else
+    if actions.who_am_i.trtl then
+        actions.calibrate_turtle()
+    else
+        actions.calibrate_pc()
+    end
+end
+sleep(1)
 multishell.launch({}, '/1_all.lua')
 multishell.setTitle(2, 'all')
