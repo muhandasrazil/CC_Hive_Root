@@ -25,7 +25,6 @@ for id, pc in pairs(actions.pcTable) do
                     actions.pcTable[self_id].location.y = actions.pcTable[self_id].location.y - 1
                 end
                 global_orientation = actions.detect_modem()
-                sleep(1)
                 local ax, ay, az = gps.locate()
                 local current_pos = {x = ax, y = ay, z = az}
                 actions.updateStateValue("location", current_pos)
@@ -48,7 +47,6 @@ for id, pc in pairs(actions.pcTable) do
         end
     end
 end
-print(global_path)
 actions.go_to(og_location,og_orientation,global_path,true)
 actions.calibrate_turtle()
 actions.updateAndBroadcast()

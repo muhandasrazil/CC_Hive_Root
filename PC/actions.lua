@@ -377,33 +377,7 @@ function log_movement(direction)
     end
     return true
 end
-function go(direction, nodig)
-    if not nodig then
-         print("layer 1")
-        if actions.detect[direction] then
-            print("layer 2")
-            if actions.detect[direction]() then
-                --safedig(direction)
-                print("layer 3")
-            end
-        end
-    end
-    if not actions.move[direction] then
-        print("layer 4")
-        return false
-    end
-    if not actions.move[direction]() then
-        while turtle.detect() do
-            turtle.up()
-            log_movement('up')
-        end
-        turtle.forward()
-        log_movement('forward')
 
-    end
-    log_movement(direction)
-    return true
-end
 
 function go_to_axis(axis, coordinate, nodig)
     local delta = coordinate - actions.pcTable[actions.who_am_i.my_id].location[axis]
@@ -467,5 +441,13 @@ function go_to(end_location, end_orientation, path, nodig)
     elseif end_location.orientation then
         if not face(end_location.orientation) then return false end
     end
+    return true
+end
+
+function go(direction, nodig)
+    if not actions.move[direction]() then
+        return false
+    end
+    log_movement(direction)
     return true
 end
