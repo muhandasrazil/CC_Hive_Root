@@ -9,8 +9,6 @@ term.setCursorPos(1,3)
 pc_selected = tonumber(read())
 print("calibrate pc orientation? y/n")
 usr_go = read()
-print("Send turtule back to start point? y/n")
-trtl_return = read()
 term.clear()
 term.setCursorPos(1,1)
 
@@ -19,37 +17,16 @@ trtl_loc = {x = actions.pcTable[17].location.x, y = actions.pcTable[17].location
 pc_loc = {x = actions.pcTable[pc_selected].location.x, y = actions.pcTable[pc_selected].location.y, z = actions.pcTable[pc_selected].location.z}
 trtl_ori = actions.pcTable[17].orientation
 pc_ori = actions.pcTable[pc_selected].orientation
-xyz_priority = 'xyz'
-dist_pc = {}
 
-
-function dist_output()
-    dist_x = math.abs(math.max(trtl_loc.x,pc_loc.x)-math.min(trtl_loc.x,pc_loc.x))
-    dist_y = math.abs(math.max(trtl_loc.y,pc_loc.y)-math.min(trtl_loc.y,pc_loc.y))
-    dist_z = math.abs(math.max(trtl_loc.z,pc_loc.z)-math.min(trtl_loc.z,pc_loc.z))
-    dist_pc = {x = dist_x, y = dist_y, z = dist_z}
-end
-dist_output()
-
-
+dist_x = math.abs(trtl_loc.x - pc_loc.x)
+dist_y = pc_loc.y - trtl_loc.y
+dist_z = math.abs(trtl_loc.z - pc_loc.z)
 
 print(trtl_loc.x,trtl_loc.y,trtl_loc.z)
 print(pc_loc.x,pc_loc.y,pc_loc.z)
-print("x: "..dist_pc.x.." y: "..dist_pc.y.." z: "..dist_pc.z)
-
-
-nav_priority = actions.nav_priority(dist_x,dist_y,dist_z)
-
-print("Navigation priority:")
-print(nav_priority)
-
-if dist_x >= dist_z then
-    xyz_priority = 'zxy'
-else
-    xyz_priority = 'xzy'
-end
-
-
+print("x: "..dist_x.." y: "..dist_y.." z: "..dist_z)
+nav_priority = actions.nav_priority(trtl_loc,pc_loc)
+print("Navigation priority: ".. nav_priority)
 
 if usr_go == 'y' then
     term.clear()
@@ -57,15 +34,15 @@ if usr_go == 'y' then
     self_id = os.getComputerID()
     og_location = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z}
     og_orientation = actions.pcTable[self_id].orientation
-    global_path = 'xzy'
     for id, pc in pairs(actions.pcTable) do
         if pc.pc_cmp then
             if pc.orientation then
-                print("Orientation for PC ID " .. id .. " is already set to " .. pc.orientation)
+                print("PC: " .. id .. " is: " .. pc.orientation)
             else
                 local target_location = {x = pc.location.x, y = pc.location.y + 1, z = pc.location.z}
                 local target_orientation = pc.orientation
-                actions.go_to(target_location,target_orientation,'xyz',true)
+                nav_priority = actions.nav_priority({x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z},target_location)
+                actions.go_to(target_location,target_orientation,nav_priority,true)
                 actions.detect_modem()
                 actions.calibrate_turtle()
                 actions.updateAndBroadcast()
@@ -73,15 +50,8 @@ if usr_go == 'y' then
             end
         end
     end
-end
-
-
-if trtl_return == 'y' then
-    actions.go_to(trtl_loc,trtl_ori,'zyx',true)
-    actions.calibrate_turtle()
-    actions.updateAndBroadcast()
-else
+    nav_priority = actions.nav_priority({x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z},trtl_loc)
+    actions.go_to(trtl_loc,trtl_ori,nav_priority,true)
     actions.calibrate_turtle()
     actions.updateAndBroadcast()
 end
-print("done!")

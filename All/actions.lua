@@ -377,8 +377,6 @@ function log_movement(direction)
     end
     return true
 end
-
-
 function go_to_axis(axis, coordinate, nodig)
     local delta = coordinate - actions.pcTable[actions.who_am_i.my_id].location[axis]
     if delta == 0 then
@@ -443,7 +441,6 @@ function go_to(end_location, end_orientation, path, nodig)
     end
     return true
 end
-
 function go(direction, nodig)
     if not actions.move[direction]() then
         return false
@@ -451,30 +448,19 @@ function go(direction, nodig)
     log_movement(direction)
     return true
 end
-
-
-
--- xyz
--- xzy
--- yxz
--- yzx
--- zxy
--- zyx
-
-function nav_priority(dist_x,dist_y,dist_z)
-    
+function nav_priority(trtl_loc,pc_loc)
+    dist_x = math.abs(trtl_loc.x - pc_loc.x)
+    dist_y = pc_loc.y - trtl_loc.y
+    dist_z = math.abs(trtl_loc.z - pc_loc.z)
     if dist_z >= dist_x then
         xzzx = 'zx'
     elseif dist_z < dist_x then
         xzzx = 'xz'
     end
-
     if dist_y >= 0 then
         y_xzzx = 'y'..xzzx
     elseif dist_y < 0 then
         y_xzzx = xzzx..'y'
     end
-
     return y_xzzx
-
 end
