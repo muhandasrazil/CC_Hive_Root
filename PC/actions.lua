@@ -415,11 +415,11 @@ function detect_modem()
     for i, direction in ipairs(directions) do
         actions.face(direction)
         actions.pcTable[actions.who_am_i.my_id].orientation = direction
-        actions.move.forward()
+        actions.go('forward')
         if turtle.detectDown() then
             return direction
         else
-            actions.move.back()
+            actions.go('back')
         end
     end
     return false
@@ -450,4 +450,31 @@ function go(direction, nodig)
     end
     log_movement(direction)
     return true
+end
+
+
+
+-- xyz
+-- xzy
+-- yxz
+-- yzx
+-- zxy
+-- zyx
+
+function nav_priority(dist_x,dist_y,dist_z)
+    
+    if dist_z >= dist_x then
+        xzzx = 'zx'
+    elseif dist_z < dist_x then
+        xzzx = 'xz'
+    end
+
+    if dist_y >= 0 then
+        y_xzzx = 'y'..xzzx
+    elseif dist_y < 0 then
+        y_xzzx = xzzx..'y'
+    end
+
+    return y_xzzx
+
 end
