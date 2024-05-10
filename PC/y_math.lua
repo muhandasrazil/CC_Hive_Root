@@ -29,8 +29,7 @@ nav_priority = actions.nav_priority(trtl_loc,pc_loc)
 print("Navigation priority: ".. nav_priority)
 
 if usr_go == 'y' then
-    term.clear()
-    term.setCursorPos(1,1)
+    
     self_id = os.getComputerID()
     og_location = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z}
     og_orientation = actions.pcTable[self_id].orientation
@@ -42,7 +41,7 @@ if usr_go == 'y' then
                 local target_location = {x = pc.location.x, y = pc.location.y + 1, z = pc.location.z}
                 local target_orientation = pc.orientation
                 nav_priority = actions.nav_priority({x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z},target_location)
-                actions.go_to(target_location,target_orientation,nav_priority,true)
+                actions.go_to(target_location,target_orientation,nav_priority,target_location)
                 actions.detect_modem()
                 actions.calibrate_turtle()
                 actions.updateAndBroadcast()
@@ -51,7 +50,7 @@ if usr_go == 'y' then
         end
     end
     nav_priority = actions.nav_priority({x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z},trtl_loc)
-    actions.go_to(trtl_loc,trtl_ori,nav_priority,true)
+    actions.go_to(trtl_loc,trtl_ori,nav_priority,trtl_loc)
     actions.calibrate_turtle()
     actions.updateAndBroadcast()
 end

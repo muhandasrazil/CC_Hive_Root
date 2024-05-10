@@ -58,7 +58,7 @@ function get_info()
             timeout_count = timeout_count + 1
         else
             local receivedData = textutils.unserialize(tostring(message))
-            if receivedData.my_id == my_self_id then
+            if message.my_id == my_self_id then
                 print("Ignoring own broadcast")
             else
                 term.clear()
