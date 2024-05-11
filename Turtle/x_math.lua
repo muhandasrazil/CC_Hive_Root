@@ -1,12 +1,12 @@
 term.clear()
 term.setCursorPos(1,1)
 actions.getAllCompData()
-
 print("Select target location:")
 local ids = {}
 for id, pc in pairs(actions.pcTable) do
     table.insert(ids, id)
 end
+table.sort(ids)
 local self_id = os.getComputerID()
 self_loc = actions.pcTable[self_id].location
 trtl_loc = {x = -190, y = 63, z = 247}
@@ -51,7 +51,6 @@ local function displayIDs(selectedIndex)
         dist_sz = math.abs(self_loc.z - pc_loc.z)
         term.write("Distance to "..ids[selectedIndex]..": "..dist_sx..", "..dist_sy..", "..dist_sz)
     end
-
     term.setCursorPos(1,6)
     term.clearLine()
     if selectedIndex and actions.pcTable[ids[selectedIndex]] and actions.pcTable[ids[selectedIndex]].orientation then
@@ -69,6 +68,11 @@ while true do
         selectedIndex = selectedIndex + 1
     elseif key == keys.left and selectedIndex > 1 then
         selectedIndex = selectedIndex - 1
+    elseif key == keys.leftShift then
+        term.clear()
+        term.setCursorPos(1,1)
+        usr_quit = true
+        break
     elseif key == keys.enter then
         break
     end
@@ -77,28 +81,22 @@ end
 go_dest = tonumber(ids[selectedIndex])
 term.clear()
 term.setCursorPos(1,1)
-print("Going to:", go_dest)
-
-
-
---trtl_loc = {x = -190, y = 63, z = 247}
-
-if go_dest == self_id then
-    pc_loc = trtl_loc
-    pc_ori = 'south'
-else
-    pc_loc = {x = actions.pcTable[go_dest].location.x, y = actions.pcTable[go_dest].location.y+1, z = actions.pcTable[go_dest].location.z}
-    pc_ori = actions.pcTable[go_dest].orientation
+if not usr_quit then
+    print("Going to:", go_dest)
+    if go_dest == self_id then
+        pc_loc = trtl_loc
+        pc_ori = 'south'
+    else
+        pc_loc = {x = actions.pcTable[go_dest].location.x, y = actions.pcTable[go_dest].location.y+1, z = actions.pcTable[go_dest].location.z}
+        pc_ori = actions.pcTable[go_dest].orientation
+    end
+    nav_priority = actions.nav_priority(self_loc,pc_loc)
+    xyz_priority = nav_priority
+    dist_pc = {}
+    print("going to: "..pc_loc.x..", "..pc_loc.y..", "..pc_loc.z)
+    actions.go_to(pc_loc,pc_ori,xyz_priority,pc_loc)
+    actions.calibrate_turtle()
+    actions.updateAndBroadcast()
 end
-
-
-nav_priority = actions.nav_priority(self_loc,pc_loc)
-xyz_priority = nav_priority
-dist_pc = {}
-
-print("going to: "..pc_loc.x..", "..pc_loc.y..", "..pc_loc.z)
-actions.go_to(pc_loc,pc_ori,xyz_priority,pc_loc)
-actions.calibrate_turtle()
-actions.updateAndBroadcast()
 term.clear()
 term.setCursorPos(1,1)

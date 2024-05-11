@@ -579,10 +579,10 @@ function nav_priority(trtl_loc,pc_loc)
     elseif dist_z < dist_x then
         xzzx = 'xz'
     end
-    if dist_y >= 0 then
-        y_xzzx = 'y'..xzzx
-    elseif dist_y < 0 then
+    if dist_y > 0 then
         y_xzzx = xzzx..'y'
+    elseif dist_y <= 0 then
+        y_xzzx = 'y'..xzzx
     end
     return y_xzzx
 end
