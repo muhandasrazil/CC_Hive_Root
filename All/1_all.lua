@@ -19,24 +19,12 @@ function waitForWakeUp()
             os.shutdown()
         elseif message == 'r' then
             os.reboot()
-        else
-            print(actions.pcTable[senderId].location.x)
-            print(actions.pcTable[senderId].location.y)
-            print(actions.pcTable[senderId].location.z)
-            if actions.pcTable[senderId].location.x == actions.pcTable[tonumber(my_self_id)].location.x + 1 then
-                orientation = 'west'
-            elseif actions.pcTable[senderId].location.x == actions.pcTable[tonumber(my_self_id)].location.x - 1 then
-                orientation = 'east'
-            elseif actions.pcTable[senderId].location.z == actions.pcTable[tonumber(my_self_id)].location.z + 1 then
-                orientation = 'north'
-            elseif actions.pcTable[senderId].location.z == actions.pcTable[tonumber(my_self_id)].location.z - 1 then
-                orientation = 'south'
-            else
-                orientation = 'north'
-            end
-            actions.updateStateValue("orientation",orientation)
+        elseif message == 'north' or message == 'south' or message == 'east' or message == 'west' then
+            actions.updateStateValue("orientation",message)
             actions.updateAndBroadcast()
-            sleep(10)
+            sleep(1)
+        else 
+            return true
         end
     end
 end

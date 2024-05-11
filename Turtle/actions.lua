@@ -244,19 +244,6 @@ function updateAndBroadcast()
     local broadcastData = stateData
     rednet.broadcast(broadcastData, 'find_me')
 end
-function a_all_cmd(cmd,id,id2)
-    if cmd == 's' then
-        rednet.broadcast('s','wake_up')
-        os.shutdown()
-    elseif cmd == 'r' then
-        rednet.broadcast('r','wake_up')
-        os.reboot()
-    elseif cmd =='o' then
-        rednet.send(tonumber(id),id2,'wake_up')
-    else
-        print("Not recognized")
-    end
-end
 function readCurrentPcData()
     local path = "CompData"
     local file = fs.open(path, "r")
@@ -349,6 +336,27 @@ function updatePcTable(stateData, pcId)
     end
     actions.getAllCompData()
 end
+function detect_modem()
+    _, ori = actions.inspect['down']()
+    if _ then
+        return ori.state.facing
+    else
+        return false
+    end
+end
+function a_all_cmd(cmd,id,id2)
+    if cmd == 's' then
+        rednet.broadcast('s','wake_up')
+        os.shutdown()
+    elseif cmd == 'r' then
+        rednet.broadcast('r','wake_up')
+        os.reboot()
+    elseif cmd =='o' then
+        rednet.send(tonumber(id),id2,'wake_up')
+    else
+        print("Not recognized")
+    end
+end
 function face(orientation)
     if actions.pcTable[actions.who_am_i.my_id].orientation == orientation then
         return true
@@ -413,7 +421,6 @@ function go_to_axis(axis, coordinate, nodig)
     end
     return true
 end
-
 function go_to(end_location, end_orientation, path, nodig)
     if path then
         for axis in path:gmatch'.' do
@@ -433,7 +440,6 @@ function go_to(end_location, end_orientation, path, nodig)
     end
     return true
 end
-
 function no_go()
     if up_check() then
         return true
@@ -479,7 +485,6 @@ function up_check()
 end
 function down_check()
     local max_count = 0
-    
     while max_count < 5 do
         if not actions.detect['down']() then
             actions.move['down']()
@@ -544,7 +549,6 @@ function left_check()
 end
 function right_check()
     local max_count = 0
-        
     while max_count < 5 do
         actions.move['right']()
         actions.log_movement('right')
@@ -590,20 +594,4 @@ function nav_priority(trtl_loc,pc_loc)
         y_xzzx = 'y'..xzzx
     end
     return y_xzzx
-end
-
-function detect_modem()
-    succsess, what_is_this = actions.inspect['down']()
-    print("I found this: "..what_is_this.name)
-    print("waiting for key press")
-    os.pullEvent("key")
-    if what_is_this.name == "computercraft:computer_advanced" then
-        print("is true now waiting for key press")
-        actions.move['forward']()
-        actions.inspect['down']()
-        os.pullEvent("key")
-    else
-        print("is false. waiting for the key press")
-        os.pullEvent("key")
-    end
 end

@@ -17,10 +17,10 @@ for _, id in ipairs(ids) do
             local self_loc = actions.pcTable[os.getComputerID()].location
             local nav_priority = actions.nav_priority(self_loc, target_location)
             actions.go_to(target_location, target_orientation, nav_priority, target_location)
-            actions.detect_modem()
+            ori_data_collect = actions.detect_modem()
             actions.calibrate_turtle()
             actions.updateAndBroadcast()
-            actions.a_all_cmd('o', id, os.getComputerID())
+            actions.a_all_cmd('o', id, ori_data_collect)
         end
     end
 end
