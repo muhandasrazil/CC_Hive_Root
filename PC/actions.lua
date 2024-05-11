@@ -357,6 +357,22 @@ function a_all_cmd(cmd,id,id2)
         print("Not recognized")
     end
 end
+function nav_priority(trtl_loc,pc_loc)
+    dist_x = math.abs(trtl_loc.x - pc_loc.x)
+    dist_y = trtl_loc.y - pc_loc.y
+    dist_z = math.abs(trtl_loc.z - pc_loc.z)
+    if dist_z >= dist_x then
+        xzzx = 'zx'
+    elseif dist_z < dist_x then
+        xzzx = 'xz'
+    end
+    if dist_y > 0 then
+        y_xzzx = xzzx..'y'
+    elseif dist_y <= 0 then
+        y_xzzx = 'y'..xzzx
+    end
+    return y_xzzx
+end
 function face(orientation)
     if actions.pcTable[actions.who_am_i.my_id].orientation == orientation then
         return true
@@ -578,20 +594,4 @@ function go(direction, nodig)
         end
     log_movement(direction)
     return true
-end
-function nav_priority(trtl_loc,pc_loc)
-    dist_x = math.abs(trtl_loc.x - pc_loc.x)
-    dist_y = trtl_loc.y - pc_loc.y
-    dist_z = math.abs(trtl_loc.z - pc_loc.z)
-    if dist_z >= dist_x then
-        xzzx = 'zx'
-    elseif dist_z < dist_x then
-        xzzx = 'xz'
-    end
-    if dist_y > 0 then
-        y_xzzx = xzzx..'y'
-    elseif dist_y <= 0 then
-        y_xzzx = 'y'..xzzx
-    end
-    return y_xzzx
 end
