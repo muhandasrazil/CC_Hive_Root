@@ -456,142 +456,93 @@ function go_to(end_location, end_orientation, path, nodig)
     end
     return true
 end
-function no_go()
-    if up_check() then
-        return true
-    elseif left_check() then
-        return true
-    elseif right_check() then
-        return true
-    elseif down_check() then
-        return true
+function go(direction, nodig)
+    if not actions.move[direction]() then
+        actions.up_chck()
     end
-    return false
+log_movement(direction)
+return true
 end
-function up_check()
-    local max_count = 0
-    up_offset = max_count
-    while max_count < 5 do
-        if not actions.detect['up']() then
-            actions.move['up']()
-            actions.log_movement('up')
-            if not actions.detect['forward']() then
-                actions.move['forward']()
-                actions.log_movement('forward')
-                return true
-            else
-                max_count = max_count + 1
-                up_offset = max_count
-            end
-        else
-            while up_offset > 0 do
-                actions.move['down']()
-                actions.log_movement('down')
-                up_offset = up_offset - 1
-            end
-            return false
-        end
-    end
-    while up_offset > 0 do
-        actions.move['down']()
-        actions.log_movement('down')
-        up_offset = up_offset - 1
-    end
-    return false
-end
-function down_check()
-    local max_count = 0
-    while max_count < 5 do
-        if not actions.detect['down']() then
-            actions.move['down']()
-            actions.log_movement('down')
-            if not actions.detect['forward']() then
-                actions.move['forward']()
-                actions.log_movement('forward')
-                return true
-            else
-                max_count = max_count + 1
-            end
-        else
-            return false
-        end
-    end
-    return false
-end
-function left_check()
-    local max_count = 0
-    left_offset = max_count
-    while max_count < 5 do
-        actions.move['left']()
-        actions.log_movement('left')
+function up_chck()
+    if not actions.detect['up']() then
+        actions.move['up']()
+        actions.log_movement('up')
         if not actions.detect['forward']() then
             actions.move['forward']()
             actions.log_movement('forward')
-            actions.move['right']()
-            actions.log_movement('right')
-            if not actions.detect['forward']() then
-                actions.move['forward']()
-                actions.log_movement('forward')
-                return true
-            else
-                max_count = max_count + 1
-                left_offset = max_count
-            end
+            return true
         else
-            actions.move['right']()
-            actions.log_movement('right')
-            actions.move['right']()
-        actions.log_movement('right')
-    while left_offset > 0 do
-        actions.move['forward']()
-        actions.log_movement('forward')
-        left_offset = left_offset - 1
-    end
-        actions.move['left']()
-        actions.log_movement('left')
             return false
         end
+    else
+        return false
     end
-    actions.move['right']()
-        actions.log_movement('right')
-    while left_offset > 0 do
+end
+function down_chck()
+    if not actions.detect['down']() then
+        actions.move['down']()
+        actions.log_movement('down')
+        if not actions.detect['forward']() then
+            actions.move['forward']()
+            actions.log_movement('forward')
+            return true
+        else
+            return false
+        end
+    else
+        return false
+    end
+end
+function left_chck()
+    actions.move['left']()
+    actions.log_movement('left')
+    if not actions.detect['forward']() then
         actions.move['forward']()
         actions.log_movement('forward')
-        left_offset = left_offset - 1
-    end
-        actions.move['left']()
-        actions.log_movement('left')
-    return false
-end
-function right_check()
-    local max_count = 0
-    while max_count < 5 do
         actions.move['right']()
         actions.log_movement('right')
         if not actions.detect['forward']() then
             actions.move['forward']()
             actions.log_movement('forward')
-            actions.move['left']()
-            actions.log_movement('left')
-            if not actions.detect['forward']() then
-                actions.move['forward']()
-                actions.log_movement('forward')
-                return true
-            else
-                max_count = max_count + 1
-            end
+            return true
         else
-            actions.move['left']()
-            actions.log_movement('left')
             return false
         end
+    else
+        actions.move['right']()
+        actions.log_movement('right')
+        return false
     end
-    return false
 end
-function go(direction, nodig)
-        if not actions.move[direction]() then
-            return actions.no_go()
+function right_chck()
+    actions.move['right']()
+    actions.log_movement('right')
+    if not actions.detect['forward']() then
+        actions.move['forward']()
+        actions.log_movement('forward')
+        actions.move['left']()
+        actions.log_movement('left')
+        if not actions.detect['forward']() then
+            actions.move['forward']()
+            actions.log_movement('forward')
+            return true
+        else
+            return false
         end
-    log_movement(direction)
-    return true
+    else
+        actions.move['left']()
+        actions.log_movement('left')
+        return false
+    end
+end
+
+function top_chck()
+    if not actions.detect['up']() then
+        
+    end
+    
+end
+
+function bottom_chck()
+    
 end
