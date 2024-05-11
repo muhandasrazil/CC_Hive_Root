@@ -55,5 +55,5 @@ sleep(1)
 multishell.launch({}, '/1_all.lua')
 multishell.setTitle(2, tostring(me))
 if turtle then
-    sleep(3)
+    sleep(7)
 end
