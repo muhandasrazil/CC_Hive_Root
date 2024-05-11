@@ -1,17 +1,11 @@
 self_id = os.getComputerID()
 og_location = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z}
 og_orientation = actions.pcTable[self_id].orientation
--- Step 1: Extract and sort IDs
 local ids = {}
 for id in pairs(actions.pcTable) do
     table.insert(ids, id)
 end
 table.sort(ids)
-for id, pc in ipairs(ids) do
-    term.write(pc .. " ")
-end
-sleep(1.2)
--- Step 2: Using sorted IDs to maintain functionalities
 for _, id in ipairs(ids) do
     local pc = actions.pcTable[id]
     if pc.pc_cmp then
@@ -30,10 +24,14 @@ for _, id in ipairs(ids) do
         end
     end
 end
-
+sleep(2)
+actions.calibrate_turtle()
+actions.updateAndBroadcast()
+sleep(.2)
 trtl_loc = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z}
 trtl_ori = actions.pcTable[self_id].orientation
 nav_priority = actions.nav_priority(trtl_loc,og_location)
+print(nav_priority)
 actions.go_to(og_location,og_orientation,nav_priority,og_location)
 actions.calibrate_turtle()
 actions.updateAndBroadcast()

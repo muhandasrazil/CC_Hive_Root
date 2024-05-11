@@ -45,6 +45,11 @@ if turtle then
         up      = turtle.detectUp,
         down    = turtle.detectDown
     }
+    inspect = {
+        forward = turtle.inspect,
+        up      = turtle.inspectUp,
+        down    = turtle.inspectDown
+    }
 end
 function calibrate_turtle()
     local sx, sy, sz = gps.locate()
@@ -588,5 +593,17 @@ function nav_priority(trtl_loc,pc_loc)
 end
 
 function detect_modem()
-    
+    succsess, what_is_this = actions.inspect['down']()
+    print("I found this: "..what_is_this.name)
+    print("waiting for key press")
+    os.pullEvent("key")
+    if what_is_this.name == "computercraft:computer_advanced" then
+        print("is true now waiting for key press")
+        actions.move['forward']()
+        actions.inspect['down']()
+        os.pullEvent("key")
+    else
+        print("is false. waiting for the key press")
+        os.pullEvent("key")
+    end
 end
