@@ -408,20 +408,7 @@ function go_to_axis(axis, coordinate, nodig)
     end
     return true
 end
-function detect_modem()
-    local directions = {'north', 'east', 'south', 'west'}
-    for i, direction in ipairs(directions) do
-        actions.face(direction)
-        actions.pcTable[actions.who_am_i.my_id].orientation = direction
-        actions.go('forward')
-        if turtle.detectDown() then
-            return direction
-        else
-            actions.go('back')
-        end
-    end
-    return false
-end
+
 function go_to(end_location, end_orientation, path, nodig)
     if path then
         for axis in path:gmatch'.' do
@@ -441,22 +428,7 @@ function go_to(end_location, end_orientation, path, nodig)
     end
     return true
 end
-function nav_priority(trtl_loc,pc_loc)
-    dist_x = math.abs(trtl_loc.x - pc_loc.x)
-    dist_y = pc_loc.y - trtl_loc.y
-    dist_z = math.abs(trtl_loc.z - pc_loc.z)
-    if dist_z >= dist_x then
-        xzzx = 'zx'
-    elseif dist_z < dist_x then
-        xzzx = 'xz'
-    end
-    if dist_y >= 0 then
-        y_xzzx = xzzx.. 'y'
-    elseif dist_y < 0 then
-        y_xzzx = xzzx..'y'
-    end
-    return y_xzzx
-end
+
 function no_go()
     if up_check() then
         return true
@@ -597,4 +569,35 @@ function go(direction, nodig)
         end
     log_movement(direction)
     return true
+end
+function nav_priority(trtl_loc,pc_loc)
+    dist_x = math.abs(trtl_loc.x - pc_loc.x)
+    dist_y = trtl_loc.y - pc_loc.y
+    dist_z = math.abs(trtl_loc.z - pc_loc.z)
+    if dist_z >= dist_x then
+        xzzx = 'zx'
+    elseif dist_z < dist_x then
+        xzzx = 'xz'
+    end
+    if dist_y >= 0 then
+        y_xzzx = 'y'..xzzx
+    elseif dist_y < 0 then
+        y_xzzx = xzzx..'y'
+    end
+    return y_xzzx
+end
+
+function detect_modem()
+    local directions = {'north', 'east', 'south', 'west'}
+    for i, direction in ipairs(directions) do
+        actions.face(direction)
+        actions.pcTable[actions.who_am_i.my_id].orientation = direction
+        actions.go('forward')
+        if turtle.detectDown() then
+            return direction
+        else
+            actions.go('back')
+        end
+    end
+    return false
 end
