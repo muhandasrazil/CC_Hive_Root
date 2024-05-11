@@ -588,16 +588,5 @@ function nav_priority(trtl_loc,pc_loc)
 end
 
 function detect_modem()
-    local directions = {'north', 'east', 'south', 'west'}
-    for i, direction in ipairs(directions) do
-        actions.face(direction)
-        actions.pcTable[actions.who_am_i.my_id].orientation = direction
-        actions.go('forward')
-        if turtle.detectDown() then
-            return direction
-        else
-            actions.go('back')
-        end
-    end
-    return false
+    
 end
