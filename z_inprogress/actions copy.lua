@@ -459,23 +459,15 @@ end
 function go(direction, Loc_data_pass, ori_pass, path)
     go_again = false
     loc_now = actions.pcTable[who_am_i.my_id].location
-    
-    -- we need to optimize the xyz priority and then if it's 
-    --more than 5 we need to move on to the next part.
-
     if not actions.move[direction]() then
-        dist_y = loc_now.y - Loc_data_pass.y
-        while dist_y < 5 do
-            if actions.up_chck() then
-                go_again = true
-                break
-            elseif dist_y >= 5 then
-                return false
-            else
-                dist_y = dist_y + 1
-            end
+        if actions.up_chck() then
+            go_again = true
+            --return true
+        else
+            return false
         end
     end
+
     if go_again then
         nav_priority = actions.nav_priority(loc_now,Loc_data_pass)
         go_to(Loc_data_pass,ori_pass,nav_priority,Loc_data_pass)
@@ -487,6 +479,7 @@ end
 function move_log(direction)
     actions.move[direction]()
     actions.log_movement(direction)
+    
 end
 function up_chck()
     if not actions.detect['up']() then
@@ -548,19 +541,21 @@ function right_chck()
         return false
     end
 end
+
+-- turtle is currently going north in this scenario. When "forward" happens from here, we mean forward = north. Turn left from there, forward = west. ETC.
 function top_chck()
-    if not actions.detect['forwad']() then
+    if not actions.detect['forwad']() then -- facing north
         move_log('forward')
         return true
     else
         move_log('left')
-        if not actions.detect['forwad']() then
+        if not actions.detect['forwad']() then -- facing west
         else
             move_log('left')
-            if not actions.detect['forwad']() then
+            if not actions.detect['forwad']() then -- facing south
             else
                 move_log('left')
-                if not actions.detect['forwad']() then
+                if not actions.detect['forwad']() then -- facing east
                 else
                     return false
                 end
@@ -568,17 +563,18 @@ function top_chck()
         end
     end
 end
+
 function bottom_chck()
-    if not actions.detect['forwad']() then
+    if not actions.detect['forwad']() then -- facing north
     else
         move_log('left')
-        if not actions.detect['forwad']() then
+        if not actions.detect['forwad']() then -- facing west
         else
             move_log('left')
-            if not actions.detect['forwad']() then
+            if not actions.detect['forwad']() then -- facing south
             else
                 move_log('left')
-                if not actions.detect['forwad']() then
+                if not actions.detect['forwad']() then -- facing east
                 else
                     return false
                 end
@@ -586,3 +582,4 @@ function bottom_chck()
         end
     end
 end
+

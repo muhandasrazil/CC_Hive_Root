@@ -406,7 +406,7 @@ function log_movement(direction)
     end
     return true
 end
-function go_to_axis(axis, coordinate, nodig)
+function go_to_axis(axis, coordinate, Loc_data_pass, ori_pass, path)
     local delta = coordinate - actions.pcTable[actions.who_am_i.my_id].location[axis]
     if delta == 0 then
         return true
@@ -427,24 +427,24 @@ function go_to_axis(axis, coordinate, nodig)
     for i = 1, math.abs(delta) do
         if axis == 'y' then
             if delta > 0 then
-                if not go('up', nodig) then return false end
+                if not go('up', Loc_data_pass, ori_pass, path) then return false end
             else
-                if not go('down', nodig) then return false end
+                if not go('down', Loc_data_pass, ori_pass, path) then return false end
             end
         else
-            if not go('forward', nodig) then return false end
+            if not go('forward', Loc_data_pass, ori_pass, path) then return false end
         end
     end
     return true
 end
-function go_to(end_location, end_orientation, path, nodig)
+function go_to(end_location, end_orientation, path, Loc_data_pass)
     if path then
         for axis in path:gmatch'.' do
-            if not go_to_axis(axis, end_location[axis], nodig) then return false end
+            if not go_to_axis(axis, end_location[axis], Loc_data_pass, end_orientation, path) then return false end
         end
     elseif end_location.path then
         for axis in end_location.path:gmatch'.' do
-            if not go_to_axis(axis, end_location[axis], nodig) then return false end
+            if not go_to_axis(axis, end_location[axis], Loc_data_pass, end_orientation, path) then return false end
         end
     else
         return false
@@ -456,20 +456,45 @@ function go_to(end_location, end_orientation, path, nodig)
     end
     return true
 end
-function go(direction, nodig)
+function go(direction, Loc_data_pass, ori_pass, path)
+    go_again = false
+    loc_now = actions.pcTable[who_am_i.my_id].location
+    
+    -- we need to optimize the xyz priority and then if it's 
+    --more than 5 we need to move on to the next part.
+
     if not actions.move[direction]() then
-        actions.up_chck()
+        dist_y = loc_now.y - Loc_data_pass.y
+        while dist_y < 5 do
+            if actions.up_chck() then
+                go_again = true
+                break
+            elseif dist_y >= 5 then
+                return false
+            else
+                dist_y = dist_y + 1
+            end
+        end
     end
-log_movement(direction)
-return true
+    if go_again then
+        nav_priority = actions.nav_priority(loc_now,Loc_data_pass)
+        go_to(Loc_data_pass,ori_pass,nav_priority,Loc_data_pass)
+    else
+        log_movement(direction)
+        return true
+    end
+end
+function move_log(direction)
+    actions.move[direction]()
+    actions.log_movement(direction)
 end
 function up_chck()
     if not actions.detect['up']() then
-        actions.move['up']()
-        actions.log_movement('up')
+        move_log('up')
         if not actions.detect['forward']() then
-            actions.move['forward']()
-            actions.log_movement('forward')
+            move_log('forward')
+            print(actions.pcTable[who_am_i.my_id].orientation)
+            sleep(1)
             return true
         else
             return false
@@ -480,11 +505,9 @@ function up_chck()
 end
 function down_chck()
     if not actions.detect['down']() then
-        actions.move['down']()
-        actions.log_movement('down')
+        move_log('down')
         if not actions.detect['forward']() then
-            actions.move['forward']()
-            actions.log_movement('forward')
+            move_log('forward')
             return true
         else
             return false
@@ -494,55 +517,72 @@ function down_chck()
     end
 end
 function left_chck()
-    actions.move['left']()
-    actions.log_movement('left')
+    move_log('left')
     if not actions.detect['forward']() then
-        actions.move['forward']()
-        actions.log_movement('forward')
-        actions.move['right']()
-        actions.log_movement('right')
+        move_log('forward')
+        move_log('right')
         if not actions.detect['forward']() then
-            actions.move['forward']()
-            actions.log_movement('forward')
+            move_log('forward')
             return true
         else
             return false
         end
     else
-        actions.move['right']()
-        actions.log_movement('right')
+        move_log('right')
         return false
     end
 end
 function right_chck()
-    actions.move['right']()
-    actions.log_movement('right')
+    move_log('right')
     if not actions.detect['forward']() then
-        actions.move['forward']()
-        actions.log_movement('forward')
-        actions.move['left']()
-        actions.log_movement('left')
+        move_log('forward')
+        move_log('left')
         if not actions.detect['forward']() then
-            actions.move['forward']()
-            actions.log_movement('forward')
+            move_log('forward')
             return true
         else
             return false
         end
     else
-        actions.move['left']()
-        actions.log_movement('left')
+        move_log('left')
         return false
     end
 end
-
 function top_chck()
-    if not actions.detect['up']() then
-        
+    if not actions.detect['forwad']() then
+        move_log('forward')
+        return true
+    else
+        move_log('left')
+        if not actions.detect['forwad']() then
+        else
+            move_log('left')
+            if not actions.detect['forwad']() then
+            else
+                move_log('left')
+                if not actions.detect['forwad']() then
+                else
+                    return false
+                end
+            end
+        end
     end
-    
 end
-
 function bottom_chck()
-    
+    if not actions.detect['forwad']() then
+    else
+        move_log('left')
+        if not actions.detect['forwad']() then
+        else
+            move_log('left')
+            if not actions.detect['forwad']() then
+            else
+                move_log('left')
+                if not actions.detect['forwad']() then
+                else
+                    return false
+                end
+            end
+        end
+    end
 end
