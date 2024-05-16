@@ -493,8 +493,6 @@ function up_chck()
         move_log('up')
         if not actions.detect['forward']() then
             move_log('forward')
-            print(actions.pcTable[who_am_i.my_id].orientation)
-            sleep(1)
             return true
         else
             return false
