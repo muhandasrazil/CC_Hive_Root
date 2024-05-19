@@ -406,30 +406,6 @@ function log_movement(direction)
     end
     return true
 end
-
-function go_to(end_location, end_orientation, path, Loc_data_pass)
-    if path then
-        for axis in path:gmatch'.' do
-            if not go_to_axis(axis, end_location[axis], Loc_data_pass, end_orientation, path) then return false end
-        end
-    elseif end_location.path then
-        for axis in end_location.path:gmatch'.' do
-            if not go_to_axis(axis, end_location[axis], Loc_data_pass, end_orientation, path) then return false end
-        end
-    else
-        return false
-    end
-    if end_orientation then
-        if not face(end_orientation) then return false end
-    elseif end_location.orientation then
-        if not face(end_location.orientation) then return false end
-    end
-    return true
-end
-
-
-
-
 function go_to_axis(axis, coordinate, Loc_data_pass, ori_pass, path)
     local delta = coordinate - actions.pcTable[actions.who_am_i.my_id].location[axis]
     if delta == 0 then
@@ -461,26 +437,62 @@ function go_to_axis(axis, coordinate, Loc_data_pass, ori_pass, path)
     end
     return true
 end
-
-
-function go(direction, Loc_data_pass, ori_pass, path)
-    if not actions.move[direction]() then
+function go_to(end_location, end_orientation, path, Loc_data_pass)
+    if path then
+        for axis in path:gmatch'.' do
+            if not go_to_axis(axis, end_location[axis], Loc_data_pass, end_orientation, path) then return false end
+        end
+    elseif end_location.path then
+        for axis in end_location.path:gmatch'.' do
+            if not go_to_axis(axis, end_location[axis], Loc_data_pass, end_orientation, path) then return false end
+        end
+    else
         return false
     end
-    actions.log_movement(direction)
+    if end_orientation then
+        if not face(end_orientation) then return false end
+    elseif end_location.orientation then
+        if not face(end_location.orientation) then return false end
+    end
     return true
 end
+function go(direction, Loc_data_pass, ori_pass, path)
+    go_again = false
+    loc_now = actions.pcTable[who_am_i.my_id].location
+    
+    -- we need to optimize the xyz priority and then if it's 
+    --more than 5 we need to move on to the next part.
 
-
+    if not actions.move[direction]() then
+        dist_y = loc_now.y - Loc_data_pass.y
+        while dist_y < 5 do
+            if actions.up_chck() then
+                go_again = true
+                break
+            elseif dist_y >= 5 then
+                return false
+            else
+                dist_y = dist_y + 1
+            end
+        end
+    end
+    if go_again then
+        nav_priority = actions.nav_priority(loc_now,Loc_data_pass)
+        go_to(Loc_data_pass,ori_pass,nav_priority,Loc_data_pass)
+    else
+        log_movement(direction)
+        return true
+    end
+end
 function move_log(direction)
     actions.move[direction]()
     actions.log_movement(direction)
 end
 function up_chck()
     if not actions.detect['up']() then
-        actions.move_log('up')
+        move_log('up')
         if not actions.detect['forward']() then
-            actions.move_log('forward')
+            move_log('forward')
             return true
         else
             return false
