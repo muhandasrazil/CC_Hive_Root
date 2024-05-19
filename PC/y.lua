@@ -16,7 +16,7 @@ for _, id in ipairs(ids) do
             local target_orientation = pc.orientation
             local self_loc = actions.pcTable[os.getComputerID()].location
             local nav_priority = actions.nav_priority(self_loc, target_location)
-            actions.go_to(target_location, target_orientation, nav_priority, target_location)
+            actions.go_to(target_location, target_orientation, nav_priority)
             ori_data_collect = actions.detect_modem()
             actions.calibrate_turtle()
             actions.updateAndBroadcast()
@@ -32,7 +32,7 @@ trtl_loc = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id
 trtl_ori = actions.pcTable[self_id].orientation
 nav_priority = actions.nav_priority(trtl_loc,og_location)
 print(nav_priority)
-actions.go_to(og_location,og_orientation,nav_priority,og_location)
+actions.go_to(og_location,og_orientation,nav_priority)
 actions.calibrate_turtle()
 actions.updateAndBroadcast()
 term.clear()

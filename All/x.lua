@@ -94,7 +94,7 @@ if not usr_quit then
     xyz_priority = nav_priority
     dist_pc = {}
     print("going to: "..pc_loc.x..", "..pc_loc.y..", "..pc_loc.z)
-    actions.go_to(pc_loc,pc_ori,xyz_priority,pc_loc)
+    actions.go_to(pc_loc,pc_ori,xyz_priority)
     actions.calibrate_turtle()
     actions.updateAndBroadcast()
 end

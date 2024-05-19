@@ -7,6 +7,6 @@ new_orientation = 'north'
 
 nav_priority = actions.nav_priority(og_location,new_location)
 
-actions.go_to(new_location,new_orientation,'yzxzy',new_location)
+actions.go_to(new_location,new_orientation,'yzxzy')
 actions.calibrate_turtle()
 actions.updateAndBroadcast()
