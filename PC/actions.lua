@@ -457,9 +457,96 @@ function go_to_axis(axis, coordinate)
     return true
 end
 function go(direction)
-    if not actions.move[direction]() then
+    if (direction == 'forward' or direction == 'up' or direction == 'down') and actions.detect[direction]() then
+        return actions.no_go()
+    end
+    actions.move_log(direction)
+    return true
+end
+
+function move_log(direction)
+    actions.move[direction]()
+    actions.log_movement(direction)
+end
+
+function no_go()
+    for i = actions.pcTable[actions.who_am_i.my_id].location.y, 70 do
+        if actions.moving_forward_check() then return true end
+    end
+    return false
+end
+
+function moving_forward_check()
+
+
+
+end
+
+function forward_left_check()
+    actions.move_log('left')
+    if not actions.detect['forward']() then
+        actions.move_log('forward')
+        actions.move_log('right')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        actions.move_log('right')
         return false
     end
-    actions.log_movement(direction)
     return true
+end
+
+function forward_right_check()
+    actions.move_log('right')
+    if not actions.detect['forward']() then
+        actions.move_log('forward')
+        actions.move_log('left')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        actions.move_log('left')
+        return false
+    end
+    return true
+end
+
+function forward_up_check()
+    if not actions.detect['up']()then
+        actions.move_log('up')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        return false
+    end
+    return true
+end
+
+function forward_down_check()
+    if not actions.detect['down']()then
+        actions.move_log('down')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        return false
+    end
+    return true
+end
+
+function moving_up_check()
+end
+
+function up_foward_check()
+end
+
+function up_left_check()
+end
+
+function up_right_check()
+end
+
+function up_back_check()
 end
