@@ -540,6 +540,8 @@ function moving_forward_check()
     end, 'up') then
         return true
     else
+        cur_height = 1
+        max_attempts = 10
         while counters.up > -max_attempts do
             if try_left_and_right() then
                 return true
