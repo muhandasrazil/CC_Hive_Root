@@ -8,7 +8,7 @@ new_orientation_2 = 'east'
 
 function new_2_go()
 nav_priority = actions.nav_priority(og_location,new_location_2)
-actions.go_to(new_location_2,new_orientation_2,'yxzxzxzy')
+actions.go_to(new_location_2,new_orientation_2,nav_priority)
 actions.calibrate_turtle()
 actions.updateAndBroadcast()
 sleep(1)
@@ -17,7 +17,7 @@ end
 
 function new_go()
 nav_priority = actions.nav_priority(og_location,new_location)
-actions.go_to(new_location,new_orientation,'xzxzxzy')
+actions.go_to(new_location,new_orientation,'xzy')
 actions.calibrate_turtle()
 actions.updateAndBroadcast()
 end
@@ -28,7 +28,8 @@ if actions.detect['forward']() then
     actions.move_log('back')
     actions.move_log('back')
 end
-actions.go_to(og_location,og_orientation,'xzxzxzy')
+nav_priority = actions.nav_priority(new_location,og_location)
+actions.go_to(og_location,og_orientation,nav_priority)
 actions.calibrate_turtle()
 actions.updateAndBroadcast()
 end
