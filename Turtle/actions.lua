@@ -456,6 +456,10 @@ function go_to_axis(axis, coordinate)
     end
     return true
 end
+function move_log(direction)
+    actions.move[direction]()
+    actions.log_movement(direction)
+end
 function go(direction)
     if (direction == 'forward' or direction == 'up' or direction == 'down') and actions.detect[direction]() then
         return actions.no_go()
@@ -463,59 +467,145 @@ function go(direction)
     actions.move_log(direction)
     return true
 end
-
-function move_log(direction)
-    actions.move[direction]()
-    actions.log_movement(direction)
-end
-
 function no_go()
-    for i = actions.pcTable[actions.who_am_i.my_id].location.y, 70 do
-        if actions.moving_forward_check() then return true end
+    if actions.moving_forward_check() then return true end
+    return false
+end
+function moving_forward_check()
+    local max_attempts = 6
+    local counters = {up = 0, down = 0, left = 0, right = 0}
+    local function try_direction(check_function, direction)
+        for i = 1, max_attempts do
+            local check_result = check_function()
+            if check_result == true then
+                return true
+            elseif check_result == false then
+                counters[direction] = counters[direction] + 1
+            elseif check_result == nil then
+                break
+            end
+        end
+        return false
+    end
+    local function return_check(direction)
+        local opposite_direction = direction == 'left' and 'right' or 'left'
+        actions.move_log(opposite_direction)
+        while counters[direction] > 0 do
+            actions.move_log('forward')
+            counters[direction] = counters[direction] - 1
+        end
+        actions.move_log(direction)
+    end
+    local function try_left_and_right()
+        if try_direction(function()
+            actions.move_log('left')
+            if not actions.detect['forward']() then
+                actions.move_log('forward')
+                actions.move_log('right')
+                return not actions.detect['forward']()
+            else
+                actions.move_log('right')
+                return nil
+            end
+        end, 'left') then
+            return true
+        else
+            return_check('left')
+            if try_direction(function()
+                actions.move_log('right')
+                if not actions.detect['forward']() then
+                    actions.move_log('forward')
+                    actions.move_log('left')
+                    return not actions.detect['forward']()
+                else
+                    actions.move_log('left')
+                    return nil
+                end
+            end, 'right') then
+                return true
+            else
+                return_check('right')
+            end
+        end
+        return false
+    end
+    if try_direction(function()
+        if not actions.detect['up']() then
+            actions.move_log('up')
+            return not actions.detect['forward']()
+        else
+            return nil
+        end
+    end, 'up') then
+        return true
+    else
+        while counters.up > -max_attempts do
+            if try_left_and_right() then
+                return true
+            elseif (function()
+                if not actions.detect['down']() then
+                    actions.move_log('down')
+                    return not actions.detect['forward']()
+                else
+                    return nil
+                end
+            end)() then
+                return true
+            else
+                counters.up = counters.up - 1
+            end
+        end
     end
     return false
 end
-
-function moving_forward_check()
-
-
-
+function moving_up_check()
+    if actions.up_foward_check() then
+        return true
+    end
+    if actions.up_left_check() then
+        return true
+    end
+    if actions.up_right_check() then
+        return true
+    end
+    if actions.up_back_check() then
+        return true
+    end
+    return false
 end
-
-function forward_left_check()
+function up_foward_check()
+    if not actions.detect['forward']() then
+        actions.move_log('forward')
+        if actions.detect['up']() then
+            actions.move_log('back')
+            return false
+        end
+    else
+        return false
+    end
+    return true
+end
+function up_left_check()
     actions.move_log('left')
     if not actions.detect['forward']() then
         actions.move_log('forward')
-        actions.move_log('right')
-        if actions.detect['forward']() then
+        if actions.detect['up']() then
+            actions.move_log('back')
+            actions.move_log('right')
             return false
         end
     else
-        actions.move_log('right')
         return false
     end
     return true
 end
-
-function forward_right_check()
+function up_right_check()
     actions.move_log('right')
     if not actions.detect['forward']() then
         actions.move_log('forward')
-        actions.move_log('left')
-        if actions.detect['forward']() then
-            return false
-        end
-    else
-        actions.move_log('left')
-        return false
-    end
-    return true
-end
-
-function forward_up_check()
-    if not actions.detect['up']()then
-        actions.move_log('up')
-        if actions.detect['forward']() then
+        if actions.detect['up']() then
+            actions.move_log('back')
+            actions.move_log('left')
             return false
         end
     else
@@ -523,30 +613,19 @@ function forward_up_check()
     end
     return true
 end
-
-function forward_down_check()
-    if not actions.detect['down']()then
-        actions.move_log('down')
-        if actions.detect['forward']() then
-            return false
-        end
-    else
-        return false
-    end
-    return true
-end
-
-function moving_up_check()
-end
-
-function up_foward_check()
-end
-
-function up_left_check()
-end
-
-function up_right_check()
-end
-
 function up_back_check()
+    actions.move_log('left')
+    actions.move_log('left')
+    if not actions.detect['forward']() then
+        actions.move_log('forward')
+        if actions.detect['up']() then
+            actions.move_log('back')
+            actions.move_log('right')
+            actions.move_log('right')
+            return false
+        end
+    else
+        return false
+    end
+    return true
 end

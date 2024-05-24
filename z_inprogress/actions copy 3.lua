@@ -473,55 +473,58 @@ function no_go()
 end
 function moving_forward_check()
     local max_attempts = 6
-    local counters = {up = 0, down = 0, left = 0, right = 0}
+    local up_counter = 0
+    local down_counter = 0
+    local left_counter = 0
+    local right_counter = 0
     local function try_direction(check_function, direction)
         for i = 1, max_attempts do
-            local check_result = check_function()
-            if check_result == true then
+            local check_check = check_function()
+            if check_check == true then
                 return true
-            elseif check_result == false then
-                counters[direction] = counters[direction] + 1
-            elseif check_result == nil then
+            elseif check_check == false then
+                if direction == 'up' then
+                    up_counter = up_counter + 1
+                elseif direction == 'down' then
+                    down_counter = down_counter + 1
+                elseif direction == 'left' then
+                    left_counter = left_counter + 1
+                elseif direction == 'right' then
+                    right_counter = right_counter + 1
+                end
+            elseif check_check == nil then
                 break
             end
         end
         return false
     end
     local function return_check(direction)
-        local opposite_direction = direction == 'left' and 'right' or 'left'
-        actions.move_log(opposite_direction)
-        while counters[direction] > 0 do
-            actions.move_log('forward')
-            counters[direction] = counters[direction] - 1
+        if direction == 'left' then
+            actions.move_log('right')
+        elseif direction == 'right' then
+            actions.move_log('left')
         end
-        actions.move_log(direction)
+        while ((left_counter > 0 and direction == 'left') or (right_counter > 0 and direction == 'right')) do
+            if direction == 'left' then
+                actions.move_log('forward')
+                left_counter = left_counter - 1
+            elseif direction == 'right' then
+                actions.move_log('forward')
+                right_counter = right_counter - 1
+            end
+        end
+        if direction == 'left' then
+            actions.move_log('left')
+        elseif direction == 'right' then
+            actions.move_log('right')
+        end
     end
     local function try_left_and_right()
-        if try_direction(function()
-            actions.move_log('left')
-            if not actions.detect['forward']() then
-                actions.move_log('forward')
-                actions.move_log('right')
-                return not actions.detect['forward']()
-            else
-                actions.move_log('right')
-                return nil
-            end
-        end, 'left') then
+        if try_direction(actions.forward_left_check, 'left') then
             return true
         else
             return_check('left')
-            if try_direction(function()
-                actions.move_log('right')
-                if not actions.detect['forward']() then
-                    actions.move_log('forward')
-                    actions.move_log('left')
-                    return not actions.detect['forward']()
-                else
-                    actions.move_log('left')
-                    return nil
-                end
-            end, 'right') then
+            if try_direction(actions.forward_right_check, 'right') then
                 return true
             else
                 return_check('right')
@@ -529,34 +532,69 @@ function moving_forward_check()
         end
         return false
     end
-    if try_direction(function()
-        if not actions.detect['up']() then
-            actions.move_log('up')
-            return not actions.detect['forward']()
-        else
-            return nil
-        end
-    end, 'up') then
+    if try_direction(actions.forward_up_check, 'up') then
         return true
     else
-        while counters.up > -max_attempts do
+        while up_counter > -max_attempts do
             if try_left_and_right() then
                 return true
-            elseif (function()
-                if not actions.detect['down']() then
-                    actions.move_log('down')
-                    return not actions.detect['forward']()
-                else
-                    return nil
-                end
-            end)() then
-                return true
             else
-                counters.up = counters.up - 1
+                actions.forward_down_check()
+                up_counter = up_counter - 1
             end
         end
     end
     return false
+end
+function forward_left_check()
+    actions.move_log('left')
+    if not actions.detect['forward']() then
+        actions.move_log('forward')
+        actions.move_log('right')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        actions.move_log('right')
+        return nil
+    end
+    return true
+end
+function forward_right_check()
+    actions.move_log('right')
+    if not actions.detect['forward']() then
+        actions.move_log('forward')
+        actions.move_log('left')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        actions.move_log('left')
+        return nil
+    end
+    return true
+end
+function forward_up_check()
+    if not actions.detect['up']() then
+        actions.move_log('up')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        return nil
+    end
+    return true
+end
+function forward_down_check()
+    if not actions.detect['down']() then
+        actions.move_log('down')
+        if actions.detect['forward']() then
+            return false
+        end
+    else
+        return nil
+    end
+    return true
 end
 function moving_up_check()
     if actions.up_foward_check() then
