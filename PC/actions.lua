@@ -472,10 +472,11 @@ function no_go()
     return false
 end
 function moving_forward_check()
-    local max_attempts = 6
+    local max_attempts = 256
+    local cur_height = actions.pcTable[actions.who_am_i.my_id].location.y
     local counters = {up = 0, down = 0, left = 0, right = 0}
     local function try_direction(check_function, direction)
-        for i = 1, max_attempts do
+        for i = cur_height, max_attempts do
             local check_result = check_function()
             if check_result == true then
                 return true
