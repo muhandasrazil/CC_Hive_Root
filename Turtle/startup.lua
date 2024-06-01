@@ -43,7 +43,8 @@ end
 local sx, sy, sz = gps.locate()
 if not sx or not sy or not sz then
     print("no gps found retaining location info")
-    return false
+    sleep(2)
+    os.reboot()
 else
     if actions.who_am_i.trtl then
         actions.calibrate_turtle()
@@ -55,5 +56,5 @@ sleep(1)
 multishell.launch({}, '/1_all.lua')
 multishell.setTitle(2, tostring(me))
 if turtle then
-    sleep(7)
+    sleep(5)
 end

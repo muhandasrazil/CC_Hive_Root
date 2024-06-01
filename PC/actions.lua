@@ -419,18 +419,15 @@ function go_to(end_location, end_orientation, path)
         end
         return true
     end
-
     local function try_path()
         for axis in path:gmatch('.') do
             if not go_to_axis(axis, end_location[axis]) then return false end
         end
         return true
     end
-
     while not reached_destination() do
         if not try_path() then return false end
     end
-
     if end_orientation then
         if not face(end_orientation) then return false end
     elseif end_location.orientation then
@@ -438,7 +435,6 @@ function go_to(end_location, end_orientation, path)
     end
     return true
 end
-
 function go_to_axis(axis, coordinate)
     local delta = coordinate - actions.pcTable[actions.who_am_i.my_id].location[axis]
     if delta == 0 then
@@ -470,18 +466,16 @@ function go_to_axis(axis, coordinate)
     end
     return true
 end
-
 function go(direction)
-    if (direction == 'forward' or direction == 'up' or direction == 'down') and actions.detect[direction]() then
-        return actions.no_go()
+    if (direction == 'forward' and actions.detect[direction]()) then
+        if actions.moving_forward_check() then return true else return false end
+    elseif (direction == 'up' and actions.detect[direction]()) then
+        return actions.moving_up_check()
+    elseif (direction == 'down' and actions.detect[direction]()) then
+        return false
     end
     actions.move_log(direction)
     return true
-end
-
-function no_go()
-    if actions.moving_forward_check() then return true end
-    return false
 end
 function moving_forward_check()
     local max_attempts = 256
@@ -500,6 +494,24 @@ function moving_forward_check()
         end
         return false
     end
+    local function try_up_again(now_height)
+        while actions.pcTable[actions.who_am_i.my_id].location.y < og_height do
+            if not actions.detect['up']() then
+                actions.move_log('up')
+                if not actions.detect['up']() and actions.pcTable[actions.who_am_i.my_id].location.y == og_height then
+                    return true
+                elseif not actions.detect['forward']() then
+                    return true
+                end
+            else
+                break
+            end
+        end
+        while actions.pcTable[actions.who_am_i.my_id].location.y > now_height do
+            actions.move_log('down')
+        end
+        return false
+    end
     local function return_check(direction)
         local opposite_direction = direction == 'left' and 'right' or 'left'
         actions.move_log(opposite_direction)
@@ -515,7 +527,11 @@ function moving_forward_check()
             if not actions.detect['forward']() then
                 actions.move_log('forward')
                 actions.move_log('right')
-                return not actions.detect['forward']()
+                if not actions.detect['forward']() then
+                    return true
+                else
+                    return try_up_again(actions.pcTable[actions.who_am_i.my_id].location.y)
+                end
             else
                 actions.move_log('right')
                 return nil
@@ -529,7 +545,11 @@ function moving_forward_check()
                 if not actions.detect['forward']() then
                     actions.move_log('forward')
                     actions.move_log('left')
-                    return not actions.detect['forward']()
+                    if not actions.detect['forward']() then
+                        return true
+                    else
+                        return try_up_again(actions.pcTable[actions.who_am_i.my_id].location.y)
+                    end
                 else
                     actions.move_log('left')
                     return nil
@@ -554,6 +574,7 @@ function moving_forward_check()
     else
         cur_height = 1
         max_attempts = 10
+        og_height = actions.pcTable[actions.who_am_i.my_id].location.y
         while counters.up > -max_attempts do
             if try_left_and_right() then
                 return true
@@ -570,21 +591,8 @@ function moving_forward_check()
     end
     return false
 end
-
 function moving_up_check()
-    if actions.up_foward_check() then
-        return true
-    end
-    if actions.up_left_check() then
-        return true
-    end
-    if actions.up_right_check() then
-        return true
-    end
-    if actions.up_back_check() then
-        return true
-    end
-    return false
+    return actions.go('forward')
 end
 function up_foward_check()
     if not actions.detect['forward']() then

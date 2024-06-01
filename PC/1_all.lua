@@ -30,7 +30,7 @@ function waitForWakeUp()
 end
 function get_info()
     timeout_count = 0
-    local increment_counter = 3
+    local increment_counter = 2
     while timeout_count < increment_counter do
         actions.getAllCompData()
         local senderId, message, protocol = rednet.receive('find_me', 2)

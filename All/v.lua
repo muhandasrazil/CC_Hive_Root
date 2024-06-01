@@ -3,7 +3,7 @@ og_location = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self
 og_orientation = actions.pcTable[self_id].orientation
 new_location = {x = actions.pcTable[self_id].location.x+10, y = actions.pcTable[self_id].location.y, z = actions.pcTable[self_id].location.z-10}
 new_orientation = 'west'
-new_location_2 = {x = actions.pcTable[self_id].location.x, y = actions.pcTable[self_id].location.y+5, z = actions.pcTable[self_id].location.z}
+new_location_2 = {x = actions.pcTable[self_id].location.x+10, y = actions.pcTable[self_id].location.y+5, z = actions.pcTable[self_id].location.z+2}
 new_orientation_2 = 'east'
 
 function new_2_go()
@@ -29,13 +29,13 @@ if actions.detect['forward']() then
     actions.move_log('back')
 end
 nav_priority = actions.nav_priority(new_location,og_location)
-actions.go_to(og_location,og_orientation,nav_priority)
+actions.go_to(og_location,og_orientation,'yxz')
 actions.calibrate_turtle()
 actions.updateAndBroadcast()
 end
 
---new_2_go()
-new_go()
+new_2_go()
+--new_go()
 return_go()
 
 term.clear()
