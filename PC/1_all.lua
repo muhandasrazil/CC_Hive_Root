@@ -9,7 +9,7 @@ function waitForWakeUp()
         elseif message == 'update_me' then
             local id2, receivedData, protocol2 = rednet.receive('find_me')
             if receivedData then
-                if actions.pcTable[senderId] then
+                if status.pcTable[senderId] then
                     actions.updatePcTable(receivedData,senderId)
                 else
                     actions.writeToPcTable(receivedData, senderId)
@@ -52,7 +52,7 @@ function get_info()
                 term.clear()
                 term.setCursorPos(1,1)
                 print("Timeout " .. timeout_count)
-                if actions.pcTable[senderId] then
+                if status.pcTable[senderId] then
                     print("Known sender ID: " .. senderId .. ", forwarding...")
                     for id in pairs(actions.readCurrentPcData().pc) do
                         if id ~= senderId and id ~= my_self_id then
@@ -73,7 +73,7 @@ function get_info()
     print("now waiting for new responses")
 end
 actions.getAllCompData()
-if not actions.pcTable[my_self_id] then
+if not status.pcTable[my_self_id] then
     local stateData = actions.readStateData()
     actions.writeToPcTable(stateData, stateData.my_id)
     rednet.broadcast('wake_up','wake_up')

@@ -3,12 +3,12 @@ term.setCursorPos(1,1)
 actions.getAllCompData()
 print("Select target location:")
 local ids = {}
-for id, pc in pairs(actions.pcTable) do
+for id, pc in pairs(status.pcTable) do
     table.insert(ids, id)
 end
 table.sort(ids)
 local self_id = os.getComputerID()
-self_loc = actions.pcTable[self_id].location
+self_loc = status.pcTable[self_id].location
 trtl_loc = {x = -190, y = 63, z = 247}
 local function displayIDs(selectedIndex)
     term.setCursorPos(1,2)
@@ -30,8 +30,8 @@ local function displayIDs(selectedIndex)
     term.setTextColor(colors.white)
     term.setCursorPos(1,3)
     term.clearLine()
-    if selectedIndex and actions.pcTable[ids[selectedIndex]] and actions.pcTable[ids[selectedIndex]].location then
-        pc_loc = actions.pcTable[ids[selectedIndex]].location
+    if selectedIndex and status.pcTable[ids[selectedIndex]] and status.pcTable[ids[selectedIndex]].location then
+        pc_loc = status.pcTable[ids[selectedIndex]].location
         term.write("x=" .. pc_loc.x .. ", y=" .. pc_loc.y .. ", z=" .. pc_loc.z)
     end
     if ids[selectedIndex] == self_id then
@@ -40,7 +40,7 @@ local function displayIDs(selectedIndex)
     term.setCursorPos(1,4)
     term.clearLine()
     if pc_loc then
-        local nav_priority = actions.nav_priority(self_loc, pc_loc)
+        local nav_priority = move.nav_priority(self_loc, pc_loc)
         term.write("Nav Priority: " .. tostring(nav_priority))
     end
     term.setCursorPos(1,5)
@@ -53,8 +53,8 @@ local function displayIDs(selectedIndex)
     end
     term.setCursorPos(1,6)
     term.clearLine()
-    if selectedIndex and actions.pcTable[ids[selectedIndex]] and actions.pcTable[ids[selectedIndex]].orientation then
-        local pc_ori = actions.pcTable[ids[selectedIndex]].orientation
+    if selectedIndex and status.pcTable[ids[selectedIndex]] and status.pcTable[ids[selectedIndex]].orientation then
+        local pc_ori = status.pcTable[ids[selectedIndex]].orientation
         if pc_ori then
             term.write("Orientation: " .. pc_ori)
         end
@@ -87,14 +87,14 @@ if not usr_quit then
         pc_loc = trtl_loc
         pc_ori = 'south'
     else
-        pc_loc = {x = actions.pcTable[go_dest].location.x, y = actions.pcTable[go_dest].location.y+1, z = actions.pcTable[go_dest].location.z}
-        pc_ori = actions.pcTable[go_dest].orientation
+        pc_loc = {x = status.pcTable[go_dest].location.x, y = status.pcTable[go_dest].location.y+1, z = status.pcTable[go_dest].location.z}
+        pc_ori = status.pcTable[go_dest].orientation
     end
-    nav_priority = actions.nav_priority(self_loc,pc_loc)
+    nav_priority = move.nav_priority(self_loc,pc_loc)
     xyz_priority = nav_priority
     dist_pc = {}
     print("going to: "..pc_loc.x..", "..pc_loc.y..", "..pc_loc.z)
-    actions.go_to(pc_loc,pc_ori,xyz_priority)
+    move.go_to(pc_loc,pc_ori,xyz_priority)
     actions.calibrate_turtle()
     actions.updateAndBroadcast()
 end

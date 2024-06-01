@@ -19,7 +19,11 @@ if fs.exists('/apis') then
 end
 fs.makeDir('/apis')
 fs.copy('/actions.lua', '/apis/actions')
+fs.copy('/status.lua', '/apis/status')
+fs.copy('/move.lua', '/apis/move')
 os.loadAPI('/apis/actions')
+os.loadAPI('/apis/status')
+os.loadAPI('/apis/move')
 for _, side in pairs({'back', 'top', 'left', 'right'}) do
     if peripheral.getType(side) == 'modem' then
         modem_side = side
@@ -28,16 +32,16 @@ for _, side in pairs({'back', 'top', 'left', 'right'}) do
     end
 end
 if turtle then
-    actions.who_am_i.trtl = true
+    status.who_am_i.trtl = true
 elseif pocket then
-    actions.who_am_i.pckt_cmp = true
+    status.who_am_i.pckt_cmp = true
 elseif commands then
-    actions.who_am_i.cmd_cmp = true
+    status.who_am_i.cmd_cmp = true
 else
-    actions.who_am_i.pc_cmp = true
+    status.who_am_i.pc_cmp = true
 end
 actions.updateStateValue('modem_side',modem_side)
-for key, v in pairs(actions.who_am_i) do
+for key, v in pairs(status.who_am_i) do
     actions.updateStateValue(key,v)
 end
 local sx, sy, sz = gps.locate()
@@ -46,7 +50,7 @@ if not sx or not sy or not sz then
     sleep(2)
     os.reboot()
 else
-    if actions.who_am_i.trtl then
+    if status.who_am_i.trtl then
         actions.calibrate_turtle()
     else
         actions.calibrate_pc()
