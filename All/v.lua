@@ -38,6 +38,7 @@ end
 
 --new_2_go()
 new_go()
+sleep(2)
 return_go()
 
 term.clear()

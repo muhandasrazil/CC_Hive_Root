@@ -14,16 +14,20 @@ function nav_priority(trtl_loc,pc_loc)
     end
     return y_xzzx
 end
+function move_log(direction)
+    status.move[direction]()
+    move.log_movement(direction)
+end
 function face(orientation)
     if status.pcTable[status.who_am_i.my_id].orientation == orientation then
         return true
     elseif status.right_shift[status.pcTable[status.who_am_i.my_id].orientation] == orientation then
-        if not go('right') then return false end
+        move_log('right')
     elseif status.left_shift[status.pcTable[status.who_am_i.my_id].orientation] == orientation then
-        if not go('left') then return false end
-    elseif status.right_shift[status.right_shift[status.pcTable[status.who_am_i.my_id].orientation]] == orientation then
-        if not go('right') then return false end
-        if not go('right') then return false end
+        move_log('left')
+    elseif status.reverse_shift[status.pcTable[status.who_am_i.my_id].orientation] == orientation then
+        move_log('left')
+        move_log('left')
     else
         return false
     end
@@ -45,22 +49,18 @@ function log_movement(direction)
     elseif direction == 'right' then
         status.pcTable[status.who_am_i.my_id].orientation = status.right_shift[status.pcTable[status.who_am_i.my_id].orientation]
     end
-    status.going.distx = math.abs(status.going.endloc.x-status.pcTable[status.who_am_i.my_id].location.x)
-    status.going.disty = math.abs(status.going.endloc.y-status.pcTable[status.who_am_i.my_id].location.y)
-    status.going.distz = math.abs(status.going.endloc.z-status.pcTable[status.who_am_i.my_id].location.z)
+    status.going.distx = status.going.endloc.x-status.pcTable[status.who_am_i.my_id].location.x
+    status.going.disty = status.going.endloc.y-status.pcTable[status.who_am_i.my_id].location.y
+    status.going.distz = status.going.endloc.z-status.pcTable[status.who_am_i.my_id].location.z
     term.clear()
     term.setCursorPos(1,1)
     print("dist "..status.going.distx.." , "..status.going.disty.." , "..status.going.distz)
     return true
 end
-function move_log(direction)
-    status.move[direction]()
-    move.log_movement(direction)
-end
 function go_to(end_location, end_orientation, path)
-    status.going.distx = math.abs(end_location.x-status.pcTable[status.who_am_i.my_id].location.x)
-    status.going.disty = math.abs(end_location.y-status.pcTable[status.who_am_i.my_id].location.y)
-    status.going.distz = math.abs(end_location.z-status.pcTable[status.who_am_i.my_id].location.z)
+    status.going.distx = end_location.x-status.pcTable[status.who_am_i.my_id].location.x
+    status.going.disty = end_location.y-status.pcTable[status.who_am_i.my_id].location.y
+    status.going.distz = end_location.z-status.pcTable[status.who_am_i.my_id].location.z
     status.going.endloc = end_location
     print("dist "..status.going.distx.." , "..status.going.disty.." , "..status.going.distz)
     local function reached_destination()
@@ -73,7 +73,7 @@ function go_to(end_location, end_orientation, path)
     end
     local function try_path()
         for axis in path:gmatch('.') do
-            if not go_to_axis(axis, end_location[axis]) then return false end
+            if not go_to_axis(axis) then return false end
         end
         return true
     end
@@ -87,27 +87,27 @@ function go_to(end_location, end_orientation, path)
     end
     return true
 end
-function go_to_axis(axis, coordinate)
-    local delta = coordinate - status.pcTable[status.who_am_i.my_id].location[axis]
-    if delta == 0 then
+function go_to_axis(axis)
+    local distKey = 'dist' .. axis
+    if status.going[distKey] == 0 then
         return true
     end
     if axis == 'x' then
-        if delta > 0 then
+        if status.going[distKey] > 0 then
             if not face('east') then return false end
         else
             if not face('west') then return false end
         end
     elseif axis == 'z' then
-        if delta > 0 then
+        if status.going[distKey] > 0 then
             if not face('south') then return false end
         else
             if not face('north') then return false end
         end
     end
-    for i = 1, math.abs(delta) do
+    while status.going[distKey] ~= 0 do
         if axis == 'y' then
-            if delta > 0 then
+            if status.going[distKey] > 0 then
                 if not go('up') then return false end
             else
                 if not go('down') then return false end
