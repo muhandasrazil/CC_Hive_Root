@@ -1,117 +1,3 @@
-function moving_forward_check()
-    local max_attempts = 256
-    local cur_height = status.pcTable[status.me].location.y
-    local counters = {up = 0, down = 0, left = 0, right = 0}
-    local function try_direction(check_function, direction)
-        for i = cur_height, max_attempts do
-            local check_result = check_function()
-            if check_result == true then
-                return true
-            elseif check_result == false then
-                counters[direction] = counters[direction] + 1
-            elseif check_result == nil then
-                break
-            end
-        end
-        return false
-    end
-    local function try_up_again(now_height)
-        while status.pcTable[status.me].location.y < og_height do
-            if not status.detect['up']() then
-                move.move_log('up')
-                if not status.detect['up']() and status.pcTable[status.me].location.y == og_height then
-                    return true
-                elseif not status.detect['forward']() then
-                    return true
-                end
-            else
-                break
-            end
-        end
-        while status.pcTable[status.me].location.y > now_height do
-            move.move_log('down')
-        end
-        return false
-    end
-    local function return_check(direction)
-        local opposite_direction = direction == 'left' and 'right' or 'left'
-        move.move_log(opposite_direction)
-        while counters[direction] > 0 do
-            move.move_log('forward')
-            counters[direction] = counters[direction] - 1
-        end
-        move.move_log(direction)
-    end
-    local function try_left_and_right()
-        if try_direction(function()
-            move.move_log('left')
-            if not status.detect['forward']() then
-                move.move_log('forward')
-                move.move_log('right')
-                if not status.detect['forward']() then
-                    return true
-                else
-                    return try_up_again(status.pcTable[status.me].location.y)
-                end
-            else
-                move.move_log('right')
-                return nil
-            end
-        end, 'left') then
-            return true
-        else
-            return_check('left')
-            if try_direction(function()
-                move.move_log('right')
-                if not status.detect['forward']() then
-                    move.move_log('forward')
-                    move.move_log('left')
-                    if not status.detect['forward']() then
-                        return true
-                    else
-                        return try_up_again(status.pcTable[status.me].location.y)
-                    end
-                else
-                    move.move_log('left')
-                    return nil
-                end
-            end, 'right') then
-                return true
-            else
-                return_check('right')
-            end
-        end
-        return false
-    end
-    if try_direction(function()
-        if not status.detect['up']() then
-            move.move_log('up')
-            return not status.detect['forward']()
-        else
-            return nil
-        end
-    end, 'up') then
-        return true
-    else
-        cur_height = 1
-        max_attempts = 10
-        og_height = status.pcTable[status.me].location.y
-        while counters.up > -max_attempts do
-            if try_left_and_right() then
-                return true
-            elseif not status.detect['down']() then
-                move.move_log('down')
-                if not status.detect['forward']() then
-                    return true
-                end
-            else
-                return false
-            end
-            counters.up = counters.up - 1
-        end
-    end
-    return false
-end
 function nav_priority(trtl_loc,pc_loc)
     dist_x = math.abs(trtl_loc.x - pc_loc.x)
     dist_y = trtl_loc.y - pc_loc.y
@@ -165,8 +51,25 @@ function log_movement(direction)
     end
     return true
 end
+
+--{x = , y = , z = }
+function status_goto_startup(end_loc, end_ori, path)
+    status.going.static.sloc = status.pcTable[status.me].location
+    status.going.static.eloc = end_loc
+    status.going.static.sloc_nav = {x = status.pcTable[status.me].location.x-end_loc.x, y = status.pcTable[status.me].location.y-end_loc.y, z =status.pcTable[status.me].location.z-end_loc.z}
+    status.going.static.sloc_nav_abs = math.abs({x = status.pcTable[status.me].location.x-end_loc.x, y = status.pcTable[status.me].location.y-end_loc.y, z =status.pcTable[status.me].location.z-end_loc.z})
+    status.going.static.eloc_nav = {x = end_loc.x-status.pcTable[status.me].location.x, y = end_loc.y-status.pcTable[status.me].location.y, z = end_loc.z-status.pcTable[status.me].location.z}
+    status.going.static.eloc_nav_abs = math.abs({x = end_loc.x-status.pcTable[status.me].location.x, y = end_loc.y-status.pcTable[status.me].location.y, z = end_loc.z-status.pcTable[status.me].location.z})
+    status.going.static.nav_priority_input = path
+    status.going.static.sdir = status.pcTable[status.me].orientation
+    status.going.static.edir = end_ori
+end
+
 function go_to(end_location, end_orientation, path)
     status.going.endloc = end_location
+    move.status_goto_startup(end_location, end_orientation, path)
+    print(textutils.serialize(status.going.static))
+    read()
     local function reached_destination()
         for axis in path:gmatch('.') do
             if status.pcTable[status.me].location[axis] ~= end_location[axis] then
@@ -223,7 +126,7 @@ function go_to_axis(axis)
 end
 function go(direction)
     if (direction == 'forward' and status.detect[direction]()) then
-        if move.moving_forward_check(end_location) then return true else return false end
+        return false
     elseif (direction == 'up' and status.detect[direction]()) then
         return false
     elseif (direction == 'down' and status.detect[direction]()) then
