@@ -163,20 +163,10 @@ function log_movement(direction)
     elseif direction == 'right' then
         status.pcTable[status.who_am_i.my_id].orientation = status.right_shift[status.pcTable[status.who_am_i.my_id].orientation]
     end
-    status.going.distx = status.going.endloc.x-status.pcTable[status.who_am_i.my_id].location.x
-    status.going.disty = status.going.endloc.y-status.pcTable[status.who_am_i.my_id].location.y
-    status.going.distz = status.going.endloc.z-status.pcTable[status.who_am_i.my_id].location.z
-    term.clear()
-    term.setCursorPos(1,1)
-    print("dist "..status.going.distx.." , "..status.going.disty.." , "..status.going.distz)
     return true
 end
 function go_to(end_location, end_orientation, path)
-    status.going.distx = end_location.x-status.pcTable[status.who_am_i.my_id].location.x
-    status.going.disty = end_location.y-status.pcTable[status.who_am_i.my_id].location.y
-    status.going.distz = end_location.z-status.pcTable[status.who_am_i.my_id].location.z
     status.going.endloc = end_location
-    print("dist "..status.going.distx.." , "..status.going.disty.." , "..status.going.distz)
     local function reached_destination()
         for axis in path:gmatch('.') do
             if status.pcTable[status.who_am_i.my_id].location[axis] ~= end_location[axis] then
