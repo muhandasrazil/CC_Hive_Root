@@ -52,8 +52,102 @@ function log_movement(direction)
     return true
 end
 
+function print_going_status(t)
+    term.clear()
+    term.setCursorPos(1,1)
+    print(t..":")
+    for _, key in ipairs(status.going[t].key_order) do
+        val = status.going[t][key]
+        term.write(key..":  ")
+        if type(val) == "table" then
+            if val.key_order then
+                for _, k in ipairs(val.key_order) do
+                    v = val[k]
+                    print(k..":  ")
+                    if type(v) == "table" then
+                        for _, subkey in ipairs(status.going.sub_order) do
+                            term.write(tostring(subkey)..": "..tostring(v[subkey]).." ")
+                        end
+                    end
+                end
+            else
+                for _, subkey in ipairs(status.going.sub_order) do
+                    term.write(tostring(subkey)..": "..tostring(val[subkey]).." ")
+                end
+            end
+        else
+            term.write(val)
+        end
+        print()
+    end
+end
+function update_stats(move, mp, detect, dp, vars, vp, print)
+    if move then
+        move.update_move(mp)
+    end
+    if detect then
+        move.update_detect(dp)
+    end
+    if vars then
+        move.update_vars(vp)
+    end
+    if print then
+        move.print_going_status('stats')
+    end
+end
+function update_move(print)
+    status.going.stats.move.total = nil
+    status.going.stats.move.pos_x = nil
+    status.going.stats.move.pos_y = nil
+    status.going.stats.move.pos_z = nil
+    status.going.stats.move.neg_x = nil
+    status.going.stats.move.neg_y = nil
+    status.going.stats.move.neg_z = nil
+    status.going.stats.move.north = nil
+    status.going.stats.move.south = nil
+    status.going.stats.move.east = nil
+    status.going.stats.move.west = nil
+    status.going.stats.move.up = nil
+    status.going.stats.move.down = nil
+    status.going.stats.move.left = nil
+    status.going.stats.move.right = nil
+    status.going.stats.move.forward = nil
+    status.going.stats.move.back = nil
+    if print then
+        move.print_going_status('stats.move')
+    end
+end
+function update_detect(print)
+    status.going.stats.detect.total = nil
+    status.going.stats.detect.up = nil
+    status.going.stats.detect.down = nil
+    status.going.stats.detect.forward = nil
+    if print then
+        move.print_going_status('stats.detect')
+    end
+end
+function update_vars(print)
+    status.going.stats.vars.tru = nil
+    status.going.stats.vars.fls = nil
+    status.going.stats.vars.go = nil
+    status.going.stats.vars.up = nil
+    status.going.stats.vars.down = nil
+    status.going.stats.vars.forward = nil
+    status.going.stats.vars.larg_x = nil
+    status.going.stats.vars.larg_y = nil
+    status.going.stats.vars.larg_z = nil
+    status.going.stats.vars.smal_x = nil
+    status.going.stats.vars.smal_y = nil
+    status.going.stats.vars.smal_z = nil
+    if print then
+        move.print_going_status('stats.vars')
+    end
+end
+
+
+
 --{x = , y = , z = }
-function status_goto_startup(end_loc, end_ori, path)
+function update_static(end_loc, end_ori, path,print)
     status.going.static.sloc = status.pcTable[status.me].location
     status.going.static.eloc = end_loc
     status.going.static.sloc_nav = {x = status.pcTable[status.me].location.x-end_loc.x, y = status.pcTable[status.me].location.y-end_loc.y, z =status.pcTable[status.me].location.z-end_loc.z}
@@ -63,12 +157,216 @@ function status_goto_startup(end_loc, end_ori, path)
     status.going.static.nav_priority_input = path
     status.going.static.sdir = status.pcTable[status.me].orientation
     status.going.static.edir = end_ori
+    if print then
+        move.print_going_status('static')
+    end
 end
-
+function update_dynmc(print)
+    status.going.dynmc.slocn = nil
+    status.going.dynmc.elocn = nil
+    status.going.dynmc.slocn_nav = {x = nil, y = nil, z = nil}
+    status.going.dynmc.slocn_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.dynmc.elocn_nav = {x = nil, y = nil, z = nil}
+    status.going.dynmc.elocn_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.dynmc.nav = {x = nil, y = nil, z = nil}
+    status.going.dynmc.nav_abs = {x = nil, y = nil, z = nil}
+    status.going.dynmc.dirn = nil
+    status.going.dynmc.sdirn = nil
+    status.going.dynmc.edirn = nil
+    status.going.dynmc.axisn = nil
+    if print then
+        move.print_going_status('dynmc')
+    end
+end
+function update_fwd(print)
+    status.going.fwd.dirfc = nil
+    status.going.fwd.sdir = nil
+    status.going.fwd.edir = nil
+    status.going.fwd.hloc = nil
+    status.going.fwd.hs_nav = {x = nil, y = nil, z = nil}
+    status.going.fwd.hs_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.he_nav = {x = nil, y = nil, z = nil}
+    status.going.fwd.he_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.nav_sh = {x = nil, y = nil, z = nil}
+    status.going.fwd.nav_sh_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.nav_he = {x = nil, y = nil, z = nil}
+    status.going.fwd.nav_he_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.h_nav_c = {x = nil, y = nil, z = nil}
+    status.going.fwd.h_nav_c_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.clos_sloc = nil
+    status.going.fwd.clos_nav_s = {x = nil, y = nil, z = nil}
+    status.going.fwd.clo_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.clo_eloc = nil
+    status.going.fwd.clo_nav_e = {x = nil, y = nil, z = nil}
+    status.going.fwd.clo_nav_e_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.fur_sloc = nil
+    status.going.fwd.fur_nav_s = {x = nil, y = nil, z = nil}
+    status.going.fwd.fur_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.fwd.fur_eloc = nil
+    status.going.fwd.fur_nav_e = {x = nil, y = nil, z = nil}
+    status.going.fwd.fur_nav_e_abs = {x = nil, y = nil, z = nil}
+    if print then
+        move.print_going_status('fwd')
+    end
+end
+function update_up(print)
+    status.going.up.dirfc = nil
+    status.going.up.sdir = nil
+    status.going.up.edir = nil
+    status.going.up.hloc = nil
+    status.going.up.hs_nav = {x = nil, y = nil, z = nil}
+    status.going.up.hs_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.up.he_nav = {x = nil, y = nil, z = nil}
+    status.going.up.he_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.up.nav_sh = {x = nil, y = nil, z = nil}
+    status.going.up.nav_sh_abs = {x = nil, y = nil, z = nil}
+    status.going.up.nav_he = {x = nil, y = nil, z = nil}
+    status.going.up.nav_he_abs = {x = nil, y = nil, z = nil}
+    status.going.up.h_nav_c = {x = nil, y = nil, z = nil}
+    status.going.up.h_nav_c_abs = {x = nil, y = nil, z = nil}
+    status.going.up.clos_sloc = nil
+    status.going.up.clos_nav_s = {x = nil, y = nil, z = nil}
+    status.going.up.clo_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.up.clo_eloc = nil
+    status.going.up.clo_nav_e = {x = nil, y = nil, z = nil}
+    status.going.up.clo_nav_e_abs = {x = nil, y = nil, z = nil}
+    status.going.up.fur_sloc = nil
+    status.going.up.fur_nav_s = {x = nil, y = nil, z = nil}
+    status.going.up.fur_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.up.fur_eloc = nil
+    status.going.up.fur_nav_e = {x = nil, y = nil, z = nil}
+    status.going.up.fur_nav_e_abs = {x = nil, y = nil, z = nil}
+    if print then
+        move.print_going_status('up')
+    end
+end
+function update_dwn(print)
+    status.going.dwn.dirfc = nil
+    status.going.dwn.sdir = nil
+    status.going.dwn.edir = nil
+    status.going.dwn.hloc = nil
+    status.going.dwn.hs_nav = {x = nil, y = nil, z = nil}
+    status.going.dwn.hs_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.he_nav = {x = nil, y = nil, z = nil}
+    status.going.dwn.he_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.nav_sh = {x = nil, y = nil, z = nil}
+    status.going.dwn.nav_sh_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.nav_he = {x = nil, y = nil, z = nil}
+    status.going.dwn.nav_he_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.h_nav_c = {x = nil, y = nil, z = nil}
+    status.going.dwn.h_nav_c_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.clos_sloc = nil
+    status.going.dwn.clos_nav_s = {x = nil, y = nil, z = nil}
+    status.going.dwn.clo_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.clo_eloc = nil
+    status.going.dwn.clo_nav_e = {x = nil, y = nil, z = nil}
+    status.going.dwn.clo_nav_e_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.fur_sloc = nil
+    status.going.dwn.fur_nav_s = {x = nil, y = nil, z = nil}
+    status.going.dwn.fur_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.dwn.fur_eloc = nil
+    status.going.dwn.fur_nav_e = {x = nil, y = nil, z = nil}
+    status.going.dwn.fur_nav_e_abs = {x = nil, y = nil, z = nil}
+    if print then
+        move.print_going_status('dwn')
+    end
+end
+function update_lft(print)
+    status.going.lft.dirfc = nil
+    status.going.lft.sdir = nil
+    status.going.lft.edir = nil
+    status.going.lft.hloc = nil
+    status.going.lft.hs_nav = {x = nil, y = nil, z = nil}
+    status.going.lft.hs_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.he_nav = {x = nil, y = nil, z = nil}
+    status.going.lft.he_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.nav_sh = {x = nil, y = nil, z = nil}
+    status.going.lft.nav_sh_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.nav_he = {x = nil, y = nil, z = nil}
+    status.going.lft.nav_he_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.h_nav_c = {x = nil, y = nil, z = nil}
+    status.going.lft.h_nav_c_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.clos_sloc = nil
+    status.going.lft.clos_nav_s = {x = nil, y = nil, z = nil}
+    status.going.lft.clo_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.clo_eloc = nil
+    status.going.lft.clo_nav_e = {x = nil, y = nil, z = nil}
+    status.going.lft.clo_nav_e_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.fur_sloc = nil
+    status.going.lft.fur_nav_s = {x = nil, y = nil, z = nil}
+    status.going.lft.fur_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.lft.fur_eloc = nil
+    status.going.lft.fur_nav_e = {x = nil, y = nil, z = nil}
+    status.going.lft.fur_nav_e_abs = {x = nil, y = nil, z = nil}
+    if print then
+        move.print_going_status('lft')
+    end
+end
+function update_rit(print)
+    status.going.rit.dirfc = nil
+    status.going.rit.sdir = nil
+    status.going.rit.edir = nil
+    status.going.rit.hloc = nil
+    status.going.rit.hs_nav = {x = nil, y = nil, z = nil}
+    status.going.rit.hs_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.he_nav = {x = nil, y = nil, z = nil}
+    status.going.rit.he_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.nav_sh = {x = nil, y = nil, z = nil}
+    status.going.rit.nav_sh_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.nav_he = {x = nil, y = nil, z = nil}
+    status.going.rit.nav_he_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.h_nav_c = {x = nil, y = nil, z = nil}
+    status.going.rit.h_nav_c_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.clos_sloc = nil
+    status.going.rit.clos_nav_s = {x = nil, y = nil, z = nil}
+    status.going.rit.clo_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.clo_eloc = nil
+    status.going.rit.clo_nav_e = {x = nil, y = nil, z = nil}
+    status.going.rit.clo_nav_e_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.fur_sloc = nil
+    status.going.rit.fur_nav_s = {x = nil, y = nil, z = nil}
+    status.going.rit.fur_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.rit.fur_eloc = nil
+    status.going.rit.fur_nav_e = {x = nil, y = nil, z = nil}
+    status.going.rit.fur_nav_e_abs = {x = nil, y = nil, z = nil}
+    if print then
+        move.print_going_status('rit')
+    end
+end
+function update_bck(print)
+    status.going.bck.dirfc = nil
+    status.going.bck.sdir = nil
+    status.going.bck.edir = nil
+    status.going.bck.hloc = nil
+    status.going.bck.hs_nav = {x = nil, y = nil, z = nil}
+    status.going.bck.hs_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.he_nav = {x = nil, y = nil, z = nil}
+    status.going.bck.he_nav_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.nav_sh = {x = nil, y = nil, z = nil}
+    status.going.bck.nav_sh_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.nav_he = {x = nil, y = nil, z = nil}
+    status.going.bck.nav_he_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.h_nav_c = {x = nil, y = nil, z = nil}
+    status.going.bck.h_nav_c_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.clos_sloc = nil
+    status.going.bck.clos_nav_s = {x = nil, y = nil, z = nil}
+    status.going.bck.clo_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.clo_eloc = nil
+    status.going.bck.clo_nav_e = {x = nil, y = nil, z = nil}
+    status.going.bck.clo_nav_e_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.fur_sloc = nil
+    status.going.bck.fur_nav_s = {x = nil, y = nil, z = nil}
+    status.going.bck.fur_nav_s_abs = {x = nil, y = nil, z = nil}
+    status.going.bck.fur_eloc = nil
+    status.going.bck.fur_nav_e = {x = nil, y = nil, z = nil}
+    status.going.bck.fur_nav_e_abs = {x = nil, y = nil, z = nil}
+    if print then
+        move.print_going_status('bck')
+    end
+end
 function go_to(end_location, end_orientation, path)
     status.going.endloc = end_location
-    move.status_goto_startup(end_location, end_orientation, path)
-    print(textutils.serialize(status.going.static))
+    move.update_static(end_location, end_orientation, path,true)
     read()
     local function reached_destination()
         for axis in path:gmatch('.') do
