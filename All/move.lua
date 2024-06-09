@@ -57,9 +57,9 @@ function status_goto_startup(end_loc, end_ori, path)
     status.going.static.sloc = status.pcTable[status.me].location
     status.going.static.eloc = end_loc
     status.going.static.sloc_nav = {x = status.pcTable[status.me].location.x-end_loc.x, y = status.pcTable[status.me].location.y-end_loc.y, z =status.pcTable[status.me].location.z-end_loc.z}
-    status.going.static.sloc_nav_abs = math.abs({x = status.pcTable[status.me].location.x-end_loc.x, y = status.pcTable[status.me].location.y-end_loc.y, z =status.pcTable[status.me].location.z-end_loc.z})
+    status.going.static.sloc_nav_abs = {x = math.abs(status.pcTable[status.me].location.x-end_loc.x), y = math.abs(status.pcTable[status.me].location.y-end_loc.y), z = math.abs(status.pcTable[status.me].location.z-end_loc.z)}
     status.going.static.eloc_nav = {x = end_loc.x-status.pcTable[status.me].location.x, y = end_loc.y-status.pcTable[status.me].location.y, z = end_loc.z-status.pcTable[status.me].location.z}
-    status.going.static.eloc_nav_abs = math.abs({x = end_loc.x-status.pcTable[status.me].location.x, y = end_loc.y-status.pcTable[status.me].location.y, z = end_loc.z-status.pcTable[status.me].location.z})
+    status.going.static.eloc_nav_abs = {x = math.abs(end_loc.x-status.pcTable[status.me].location.x),y = math.abs(end_loc.y-status.pcTable[status.me].location.y), z = math.abs(end_loc.z-status.pcTable[status.me].location.z)}
     status.going.static.nav_priority_input = path
     status.going.static.sdir = status.pcTable[status.me].orientation
     status.going.static.edir = end_ori
