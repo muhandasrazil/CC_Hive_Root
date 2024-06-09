@@ -52,6 +52,62 @@ if turtle then
     }
     going = {
 --                                                                                                                                                 <>
+        --| Recording the statistics of the turtle throughout it's entire travels.
+--                                                                                                                                                 <>
+    stats = {
+        --| Total times we performed this
+        move = {
+                --- Total movements performed
+            total = nil,
+                --- Movement of axis. This would be if the previous position = current position +-1.
+            pos_x = nil,
+            pos_y = nil,
+            pos_z = nil,
+            neg_x = nil,
+            neg_y = nil,
+            neg_z = nil,
+                --- Movement of cardinal direction.
+            north = nil,
+            south = nil,
+            east = nil,
+            west = nil,
+                --- Movement of direction. This is the direction syntax for go(direction)
+            up = nil,
+            down = nil,
+            left = nil,
+            right = nil,
+            forward = nil,
+            back = nil,
+        },
+        detect = {
+                --- Total detections made
+            total = nil,
+                --- detections made in direction
+            up = nil,
+            down = nil,
+            forward = nil,
+        },
+        --| Total times a thing happened. variables, functions called, updates maybe.
+        vars = {
+                --- Total number of times go returned a true or false
+            tru = nil,
+            fls = nil,
+                --- Total number of times go is called.
+                --- Total number of times a direction is called. This is for things after we detect. 
+            go = nil,
+            up = nil,
+            down = nil,
+            forward = nil,
+                --- The xyz boundries. Largest xyz, smallest xyz. Fun to have if we end up at world height
+            larg_x = nil,
+            larg_y = nil,
+            larg_z = nil,
+            smal_x = nil,
+            smal_y = nil,
+            smal_z = nil,
+        },
+    },
+--                                                                                                                                                 <>
         --| recording all general information. My position where I'm going the math involved ETC
 --                                                                                                                                                 <>
         --| recording static data. These inputs can come from the "status'. 
