@@ -1,4 +1,5 @@
 pcTable = {}
+me = os.getComputerID()
 who_am_i = {
     trtl = false,
     pckt_cmp = false,

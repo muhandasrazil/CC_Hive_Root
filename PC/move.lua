@@ -1,6 +1,6 @@
 function moving_forward_check()
     local max_attempts = 256
-    local cur_height = status.pcTable[status.who_am_i.my_id].location.y
+    local cur_height = status.pcTable[status.me].location.y
     local counters = {up = 0, down = 0, left = 0, right = 0}
     local function try_direction(check_function, direction)
         for i = cur_height, max_attempts do
@@ -16,10 +16,10 @@ function moving_forward_check()
         return false
     end
     local function try_up_again(now_height)
-        while status.pcTable[status.who_am_i.my_id].location.y < og_height do
+        while status.pcTable[status.me].location.y < og_height do
             if not status.detect['up']() then
                 move.move_log('up')
-                if not status.detect['up']() and status.pcTable[status.who_am_i.my_id].location.y == og_height then
+                if not status.detect['up']() and status.pcTable[status.me].location.y == og_height then
                     return true
                 elseif not status.detect['forward']() then
                     return true
@@ -28,7 +28,7 @@ function moving_forward_check()
                 break
             end
         end
-        while status.pcTable[status.who_am_i.my_id].location.y > now_height do
+        while status.pcTable[status.me].location.y > now_height do
             move.move_log('down')
         end
         return false
@@ -51,7 +51,7 @@ function moving_forward_check()
                 if not status.detect['forward']() then
                     return true
                 else
-                    return try_up_again(status.pcTable[status.who_am_i.my_id].location.y)
+                    return try_up_again(status.pcTable[status.me].location.y)
                 end
             else
                 move.move_log('right')
@@ -69,7 +69,7 @@ function moving_forward_check()
                     if not status.detect['forward']() then
                         return true
                     else
-                        return try_up_again(status.pcTable[status.who_am_i.my_id].location.y)
+                        return try_up_again(status.pcTable[status.me].location.y)
                     end
                 else
                     move.move_log('left')
@@ -95,7 +95,7 @@ function moving_forward_check()
     else
         cur_height = 1
         max_attempts = 10
-        og_height = status.pcTable[status.who_am_i.my_id].location.y
+        og_height = status.pcTable[status.me].location.y
         while counters.up > -max_attempts do
             if try_left_and_right() then
                 return true
@@ -133,13 +133,13 @@ function move_log(direction)
     move.log_movement(direction)
 end
 function face(orientation)
-    if status.pcTable[status.who_am_i.my_id].orientation == orientation then
+    if status.pcTable[status.me].orientation == orientation then
         return true
-    elseif status.right_shift[status.pcTable[status.who_am_i.my_id].orientation] == orientation then
+    elseif status.right_shift[status.pcTable[status.me].orientation] == orientation then
         move_log('right')
-    elseif status.left_shift[status.pcTable[status.who_am_i.my_id].orientation] == orientation then
+    elseif status.left_shift[status.pcTable[status.me].orientation] == orientation then
         move_log('left')
-    elseif status.reverse_shift[status.pcTable[status.who_am_i.my_id].orientation] == orientation then
+    elseif status.reverse_shift[status.pcTable[status.me].orientation] == orientation then
         move_log('left')
         move_log('left')
     else
@@ -149,19 +149,19 @@ function face(orientation)
 end
 function log_movement(direction)
     if direction == 'up' then
-        status.pcTable[status.who_am_i.my_id].location.y = status.pcTable[status.who_am_i.my_id].location.y +1
+        status.pcTable[status.me].location.y = status.pcTable[status.me].location.y +1
     elseif direction == 'down' then
-        status.pcTable[status.who_am_i.my_id].location.y = status.pcTable[status.who_am_i.my_id].location.y -1
+        status.pcTable[status.me].location.y = status.pcTable[status.me].location.y -1
     elseif direction == 'forward' then
-        bump = status.bumps[status.pcTable[status.who_am_i.my_id].orientation]
-        status.pcTable[status.who_am_i.my_id].location = {x = status.pcTable[status.who_am_i.my_id].location.x + bump[1], y = status.pcTable[status.who_am_i.my_id].location.y + bump[2], z = status.pcTable[status.who_am_i.my_id].location.z + bump[3]}
+        bump = status.bumps[status.pcTable[status.me].orientation]
+        status.pcTable[status.me].location = {x = status.pcTable[status.me].location.x + bump[1], y = status.pcTable[status.me].location.y + bump[2], z = status.pcTable[status.me].location.z + bump[3]}
     elseif direction == 'back' then
-        bump = status.bumps[status.pcTable[status.who_am_i.my_id].orientation]
-        status.pcTable[status.who_am_i.my_id].location = {x = status.pcTable[status.who_am_i.my_id].location.x - bump[1], y = status.pcTable[status.who_am_i.my_id].location.y - bump[2], z = status.pcTable[status.who_am_i.my_id].location.z - bump[3]}
+        bump = status.bumps[status.pcTable[status.me].orientation]
+        status.pcTable[status.me].location = {x = status.pcTable[status.me].location.x - bump[1], y = status.pcTable[status.me].location.y - bump[2], z = status.pcTable[status.me].location.z - bump[3]}
     elseif direction == 'left' then
-        status.pcTable[status.who_am_i.my_id].orientation = status.left_shift[status.pcTable[status.who_am_i.my_id].orientation]
+        status.pcTable[status.me].orientation = status.left_shift[status.pcTable[status.me].orientation]
     elseif direction == 'right' then
-        status.pcTable[status.who_am_i.my_id].orientation = status.right_shift[status.pcTable[status.who_am_i.my_id].orientation]
+        status.pcTable[status.me].orientation = status.right_shift[status.pcTable[status.me].orientation]
     end
     return true
 end
@@ -169,7 +169,7 @@ function go_to(end_location, end_orientation, path)
     status.going.endloc = end_location
     local function reached_destination()
         for axis in path:gmatch('.') do
-            if status.pcTable[status.who_am_i.my_id].location[axis] ~= end_location[axis] then
+            if status.pcTable[status.me].location[axis] ~= end_location[axis] then
                 return false
             end
         end
@@ -192,25 +192,25 @@ function go_to(end_location, end_orientation, path)
     return true
 end
 function go_to_axis(axis)
-    if status.going.endloc[axis]-status.pcTable[status.who_am_i.my_id].location[axis] == 0 then
+    if status.going.endloc[axis]-status.pcTable[status.me].location[axis] == 0 then
         return true
     end
     if axis == 'x' then
-        if status.going.endloc[axis]-status.pcTable[status.who_am_i.my_id].location[axis] > 0 then
+        if status.going.endloc[axis]-status.pcTable[status.me].location[axis] > 0 then
             if not face('east') then return false end
         else
             if not face('west') then return false end
         end
     elseif axis == 'z' then
-        if status.going.endloc[axis]-status.pcTable[status.who_am_i.my_id].location[axis] > 0 then
+        if status.going.endloc[axis]-status.pcTable[status.me].location[axis] > 0 then
             if not face('south') then return false end
         else
             if not face('north') then return false end
         end
     end
-    while status.going.endloc[axis]-status.pcTable[status.who_am_i.my_id].location[axis] ~= 0 do
+    while status.going.endloc[axis]-status.pcTable[status.me].location[axis] ~= 0 do
         if axis == 'y' then
-            if status.going.endloc[axis]-status.pcTable[status.who_am_i.my_id].location[axis] > 0 then
+            if status.going.endloc[axis]-status.pcTable[status.me].location[axis] > 0 then
                 if not go('up') then return false end
             else
                 if not go('down') then return false end
