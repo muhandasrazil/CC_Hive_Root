@@ -155,24 +155,24 @@ if turtle then
             --- key order is to allow us to work in the correct order in a for loop
         key_order = {"sloc","eloc","sloc_nav","sloc_nav_abs","eloc_nav","eloc_nav_abs","nav_priority_input","sdir","edir"},
             --- starting location xyz
-        sloc = nil,                                             --+ positive and negative xyz
+        sloc = nil,                                             --* positive and negative xyz
             --- end locaiton xyz
-        eloc = nil,                                             --+ positive and negative xyz
+        eloc = nil,                                             --* positive and negative xyz
             --- optimal pathing that the turtle records on start
             --- strtloc optimal is the xyz turtle thinks it needs to go
             --- strtloc optimal abs is the absolute the turtle thinks it needs to go.
-        sloc_nav = nil,                                         --+ positive and negative xyz
-        sloc_nav_abs = nil,                                     --* absolute value of distance
+        sloc_nav = nil,                                         --* positive and negative xyz
+        sloc_nav_abs = nil,                                     --+ absolute value of distance
             --- endloc optimal is the xyz distance to be traveled from the perspective of the end destination
             --- endloc optimal abs is the absolute value the end thinks the turtle should go
-        eloc_nav = nil,                                         --+ positive and negative xyz
-        eloc_nav_abs = nil,                                     --* absolute value of distance
+        eloc_nav = nil,                                         --* positive and negative xyz
+        eloc_nav_abs = nil,                                     --+ absolute value of distance
             --- storing strings for the nav priority and the compass directions
-        nav_priority_input = nil,                               --* STRING
+        nav_priority_input = nil,                               --+ STRING
             --- cardinal direction start to end
             --- cardinal direction end to start
-        sdir = nil,                                             --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        edir = nil                                              --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        sdir = nil,                                             --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        edir = nil                                              --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
     },
 --                                                                                                                                                 <>
         --| Mapping the dynamic distance for the turtle movement directly. This is outside of the Maze solver
@@ -182,28 +182,28 @@ if turtle then
             --- This is to record the where in the world we are. sanity check against the API "status.pctable[who_am_i.my_id].location"
             --- now dist is the xyz of the distance from right now to the end. sanity check against static
             --- now dist abs is the distance we have left to go to get to the end position.
-        slocn = nil,                                            --* positive and negative xyz
-        slocn_nav = nil,                                        --+ positive and negative xyz
-        slocn_nav_abs = nil,                                    --* absolute value of distance
+        slocn = nil,                                            --+ positive and negative xyz
+        slocn_nav = nil,                                        --* positive and negative xyz
+        slocn_nav_abs = nil,                                    --+ absolute value of distance
             --- this records where the end location is. Use to sanity check against the end location static. 
             --- now dist is where we THINK the end destination is. Used as sanity check to compare against static.
             --- now dist abs is the absolute of how far away we are from the end destination. Used as comparison for sanity check
-        elocn = nil,                                            --* positive and negative xyz
-        elocn_nav = nil,                                        --+ positive and negative xyz
-        elocn_nav_abs = nil,                                    --* absolute value of distance
+        elocn = nil,                                            --+ positive and negative xyz
+        elocn_nav = nil,                                        --* positive and negative xyz
+        elocn_nav_abs = nil,                                    --+ absolute value of distance
             --- Tracking the actual movement the turle has made. 
             --- Dist by axis is the xyz real world we have gone. +x will increment x, -x will decrement x
             --- dist by axis abs is the total times the turtle moves ever by the axis.
-        nav = nil,                                              --* positive and negative xyz
-        nav_abs = nil,                                          --+ absolute value of distance
+        nav = nil,                                              --+ positive and negative xyz
+        nav_abs = nil,                                          --* absolute value of distance
             --- cardinal direction we are currently facing
             --- cardinal direction from now to start
             --- cardinal direction from now to end
             --- axis we are currently on
-        dirn = nil,                                             --* STRING
-        sdirn = nil,                                            --+ STRING
-        edirn = nil,                                            --* STRING
-        axisn = nil                                             --+ STRING
+        dirn = nil,                                             --+ STRING
+        sdirn = nil,                                            --* STRING
+        edirn = nil,                                            --+ STRING
+        axisn = nil                                             --* STRING
     },
 --                                                                                                                                                 <>
         --| Recording the information to detect when we have encountered a block
@@ -218,43 +218,43 @@ if turtle then
             --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
             --- halt cardinal direction from start
             --- halt cardinal direction from end
-        dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+        dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
             --- This is the xyz when we encountered a block and now we have halted. position halt
             --- distance from the staring position to the halt position. And absolute version
             --- distance from the end position to the halt position. And absolute version
             --- distance from the halt position to the start position
             --- distance from the halt position to the end
-        hloc = nil,                                         --* positive and negative xyz
-        hs_nav = nil,                                       --+ positive and negative xyz
-        hs_nav_abs = nil,                                   --* absolute value of distance
-        he_nav = nil,                                       --+ positive and negative xyz
-        he_nav_abs = nil,                                   --* absolute value of distance
-        nav_sh = nil,                                       --+ positive and negative xyz
-        nav_sh_abs = nil,                                   --* absolute value of distance
-        nav_he = nil,                                       --+ positive and negative xyz
-        nav_he_abs = nil,                                   --* absolute value of distance
+        hloc = nil,                                         --+ positive and negative xyz
+        hs_nav = nil,                                       --* positive and negative xyz
+        hs_nav_abs = nil,                                   --+ absolute value of distance
+        he_nav = nil,                                       --* positive and negative xyz
+        he_nav_abs = nil,                                   --+ absolute value of distance
+        nav_sh = nil,                                       --* positive and negative xyz
+        nav_sh_abs = nil,                                   --+ absolute value of distance
+        nav_he = nil,                                       --* positive and negative xyz
+        nav_he_abs = nil,                                   --+ absolute value of distance
         --| dynamic variables for our relation with halt
             --- distance we are from the halt position
-        h_nav_c = nil,                                      --+ positive and negative xyz
-        h_nav_c_abs = nil,                                  --* absolute value of distance
+        h_nav_c = nil,                                      --* positive and negative xyz
+        h_nav_c_abs = nil,                                  --+ absolute value of distance
             --- closest position to start 
             --- closest position to end 
-        clos_sloc = nil,                                    --+ positive and negative xyz
-        clos_nav_s = nil,                                   --* positive and negative xyz
-        clo_nav_s_abs = nil,                                --+ absolute value of distance
-        clo_eloc = nil,                                     --* positive and negative xyz
-        clo_nav_e = nil,                                    --+ positive and negative xyz
-        clo_nav_e_abs = nil,                                --* absolute value of distance
+        clos_sloc = nil,                                    --* positive and negative xyz
+        clos_nav_s = nil,                                   --+ positive and negative xyz
+        clo_nav_s_abs = nil,                                --* absolute value of distance
+        clo_eloc = nil,                                     --+ positive and negative xyz
+        clo_nav_e = nil,                                    --* positive and negative xyz
+        clo_nav_e_abs = nil,                                --+ absolute value of distance
            --- furthest position from the start
            --- furthest position from the end
-        fur_sloc = nil,                                     --+ positive and negative xyz
-        fur_nav_s = nil,                                    --* positive and negative xyz
-        fur_nav_s_abs = nil,                                --+ absolute value of distance
-        fur_eloc = nil,                                     --* positive and negative xyz
-        fur_nav_e = nil,                                    --+ positive and negative xyz
-        fur_nav_e_abs = nil                                 --* absolute value of distance
+        fur_sloc = nil,                                     --* positive and negative xyz
+        fur_nav_s = nil,                                    --+ positive and negative xyz
+        fur_nav_s_abs = nil,                                --* absolute value of distance
+        fur_eloc = nil,                                     --+ positive and negative xyz
+        fur_nav_e = nil,                                    --* positive and negative xyz
+        fur_nav_e_abs = nil                                 --+ absolute value of distance
     },
 --                                                                                                                                                 <>
         --| Up
@@ -267,43 +267,43 @@ if turtle then
             --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
             --- halt cardinal direction from start
             --- halt cardinal direction from end
-        dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+        dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
             --- This is the xyz when we encountered a block and now we have halted. position halt
             --- distance from the staring position to the halt position. And absolute version
             --- distance from the end position to the halt position. And absolute version
             --- distance from the halt position to the start position
             --- distance from the halt position to the end
-        hloc = nil,                                         --+ positive and negative xyz
-        hs_nav = nil,                                       --* positive and negative xyz
-        hs_nav_abs = nil,                                   --+ absolute value of distance
-        he_nav = nil,                                       --* positive and negative xyz
-        he_nav_abs = nil,                                   --+ absolute value of distance
-        nav_sh = nil,                                       --* positive and negative xyz
-        nav_sh_abs = nil,                                   --+ absolute value of distance
-        nav_he = nil,                                       --* positive and negative xyz
-        nav_he_abs = nil,                                   --+ absolute value of distance
+        hloc = nil,                                         --* positive and negative xyz
+        hs_nav = nil,                                       --+ positive and negative xyz
+        hs_nav_abs = nil,                                   --* absolute value of distance
+        he_nav = nil,                                       --+ positive and negative xyz
+        he_nav_abs = nil,                                   --* absolute value of distance
+        nav_sh = nil,                                       --+ positive and negative xyz
+        nav_sh_abs = nil,                                   --* absolute value of distance
+        nav_he = nil,                                       --+ positive and negative xyz
+        nav_he_abs = nil,                                   --* absolute value of distance
         --| dynamic variables for our relation with halt
             --- distance we are from the halt position
-        h_nav_c = nil,                                      --* positive and negative xyz
-        h_nav_c_abs = nil,                                  --+ absolute value of distance
+        h_nav_c = nil,                                      --+ positive and negative xyz
+        h_nav_c_abs = nil,                                  --* absolute value of distance
             --- closest position to start 
             --- closest position to end 
-        clos_sloc = nil,                                    --* positive and negative xyz
-        clos_nav_s = nil,                                   --+ positive and negative xyz
-        clo_nav_s_abs = nil,                                --* absolute value of distance
-        clo_eloc = nil,                                     --+ positive and negative xyz
-        clo_nav_e = nil,                                    --* positive and negative xyz
-        clo_nav_e_abs = nil,                                --+ absolute value of distance
+        clos_sloc = nil,                                    --+ positive and negative xyz
+        clos_nav_s = nil,                                   --* positive and negative xyz
+        clo_nav_s_abs = nil,                                --+ absolute value of distance
+        clo_eloc = nil,                                     --* positive and negative xyz
+        clo_nav_e = nil,                                    --+ positive and negative xyz
+        clo_nav_e_abs = nil,                                --* absolute value of distance
             --- furthest position from the start
             --- furthest position from the end
-        fur_sloc = nil,                                     --* positive and negative xyz
-        fur_nav_s = nil,                                    --+ positive and negative xyz
-        fur_nav_s_abs = nil,                                --* absolute value of distance
-        fur_eloc = nil,                                     --+ positive and negative xyz
-        fur_nav_e = nil,                                    --* positive and negative xyz
-        fur_nav_e_abs = nil                                 --+ absolute value of distance
+        fur_sloc = nil,                                     --+ positive and negative xyz
+        fur_nav_s = nil,                                    --* positive and negative xyz
+        fur_nav_s_abs = nil,                                --+ absolute value of distance
+        fur_eloc = nil,                                     --* positive and negative xyz
+        fur_nav_e = nil,                                    --+ positive and negative xyz
+        fur_nav_e_abs = nil                                 --* absolute value of distance
     },
 --                                                                                                                                                 <>
         --| Down
@@ -316,55 +316,6 @@ if turtle then
             --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
             --- halt cardinal direction from start
             --- halt cardinal direction from end
-        dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
-            --- This is the xyz when we encountered a block and now we have halted. position halt
-            --- distance from the staring position to the halt position. And absolute version
-            --- distance from the end position to the halt position. And absolute version
-            --- distance from the halt position to the start position
-            --- distance from the halt position to the end
-        hloc = nil,                                         --* positive and negative xyz
-        hs_nav = nil,                                       --+ positive and negative xyz
-        hs_nav_abs = nil,                                   --* absolute value of distance
-        he_nav = nil,                                       --+ positive and negative xyz
-        he_nav_abs = nil,                                   --* absolute value of distance
-        nav_sh = nil,                                       --+ positive and negative xyz
-        nav_sh_abs = nil,                                   --* absolute value of distance
-        nav_he = nil,                                       --+ positive and negative xyz
-        nav_he_abs = nil,                                   --* absolute value of distance
-        --| dynamic variables for our relation with halt
-            --- distance we are from the halt position
-        h_nav_c = nil,                                      --+ positive and negative xyz
-        h_nav_c_abs = nil,                                  --* absolute value of distance
-            --- closest position to start 
-            --- closest position to end 
-        clos_sloc = nil,                                    --+ positive and negative xyz
-        clos_nav_s = nil,                                   --* positive and negative xyz
-        clo_nav_s_abs = nil,                                --+ absolute value of distance
-        clo_eloc = nil,                                     --* positive and negative xyz
-        clo_nav_e = nil,                                    --+ positive and negative xyz
-        clo_nav_e_abs = nil,                                --* absolute value of distance
-            --- furthest position from the start
-            --- furthest position from the end
-        fur_sloc = nil,                                     --+ positive and negative xyz
-        fur_nav_s = nil,                                    --* positive and negative xyz
-        fur_nav_s_abs = nil,                                --+ absolute value of distance
-        fur_eloc = nil,                                     --* positive and negative xyz
-        fur_nav_e = nil,                                    --+ positive and negative xyz
-        fur_nav_e_abs = nil                                 --* absolute value of distance
-    },
---                                                                                                                                                 <>
-        --| Left
-        --| Left will always require a turn command for movement.
-        --| The center point will be applied to the above forward, up, down and then mathed here
-        --| static variables for halt
-    lft = {
-            --- key order is to allow us to work in the correct order in a for loop
-        key_order = {"dirfc","sdir","edir","hloc","hs_nav","hs_nav_abs","he_nav","he_nav_abs","nav_sh","nav_sh_abs","nav_he","nav_he_abs","h_nav_c","h_nav_c_abs","clos_sloc","clos_nav_s","clo_nav_s_abs","clo_eloc","clo_nav_e","clo_nav_e_abs","fur_sloc","fur_nav_s","fur_nav_s_abs","fur_eloc","fur_nav_e","fur_nav_e_abs"},
-            --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
-            --- halt cardinal direction from start
-            --- halt cardinal direction from end
         dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
         sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
         edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
@@ -404,11 +355,11 @@ if turtle then
         fur_nav_e_abs = nil                                 --+ absolute value of distance
     },
 --                                                                                                                                                 <>
-        --| Right
-        --| Right will always require a turn command for movement.
+        --| Left
+        --| Left will always require a turn command for movement.
         --| The center point will be applied to the above forward, up, down and then mathed here
         --| static variables for halt
-    rit = {
+    lft = {
             --- key order is to allow us to work in the correct order in a for loop
         key_order = {"dirfc","sdir","edir","hloc","hs_nav","hs_nav_abs","he_nav","he_nav_abs","nav_sh","nav_sh_abs","nav_he","nav_he_abs","h_nav_c","h_nav_c_abs","clos_sloc","clos_nav_s","clo_nav_s_abs","clo_eloc","clo_nav_e","clo_nav_e_abs","fur_sloc","fur_nav_s","fur_nav_s_abs","fur_eloc","fur_nav_e","fur_nav_e_abs"},
             --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
@@ -443,14 +394,63 @@ if turtle then
         clo_eloc = nil,                                     --* positive and negative xyz
         clo_nav_e = nil,                                    --+ positive and negative xyz
         clo_nav_e_abs = nil,                                --* absolute value of distance
-           --- furthest position from the start
-           --- furthest position from the end
+            --- furthest position from the start
+            --- furthest position from the end
         fur_sloc = nil,                                     --+ positive and negative xyz
         fur_nav_s = nil,                                    --* positive and negative xyz
         fur_nav_s_abs = nil,                                --+ absolute value of distance
         fur_eloc = nil,                                     --* positive and negative xyz
         fur_nav_e = nil,                                    --+ positive and negative xyz
         fur_nav_e_abs = nil                                 --* absolute value of distance
+    },
+--                                                                                                                                                 <>
+        --| Right
+        --| Right will always require a turn command for movement.
+        --| The center point will be applied to the above forward, up, down and then mathed here
+        --| static variables for halt
+    rit = {
+            --- key order is to allow us to work in the correct order in a for loop
+        key_order = {"dirfc","sdir","edir","hloc","hs_nav","hs_nav_abs","he_nav","he_nav_abs","nav_sh","nav_sh_abs","nav_he","nav_he_abs","h_nav_c","h_nav_c_abs","clos_sloc","clos_nav_s","clo_nav_s_abs","clo_eloc","clo_nav_e","clo_nav_e_abs","fur_sloc","fur_nav_s","fur_nav_s_abs","fur_eloc","fur_nav_e","fur_nav_e_abs"},
+            --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
+            --- halt cardinal direction from start
+            --- halt cardinal direction from end
+        dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+            --- This is the xyz when we encountered a block and now we have halted. position halt
+            --- distance from the staring position to the halt position. And absolute version
+            --- distance from the end position to the halt position. And absolute version
+            --- distance from the halt position to the start position
+            --- distance from the halt position to the end
+        hloc = nil,                                         --+ positive and negative xyz
+        hs_nav = nil,                                       --* positive and negative xyz
+        hs_nav_abs = nil,                                   --+ absolute value of distance
+        he_nav = nil,                                       --* positive and negative xyz
+        he_nav_abs = nil,                                   --+ absolute value of distance
+        nav_sh = nil,                                       --* positive and negative xyz
+        nav_sh_abs = nil,                                   --+ absolute value of distance
+        nav_he = nil,                                       --* positive and negative xyz
+        nav_he_abs = nil,                                   --+ absolute value of distance
+        --| dynamic variables for our relation with halt
+            --- distance we are from the halt position
+        h_nav_c = nil,                                      --* positive and negative xyz
+        h_nav_c_abs = nil,                                  --+ absolute value of distance
+            --- closest position to start 
+            --- closest position to end 
+        clos_sloc = nil,                                    --* positive and negative xyz
+        clos_nav_s = nil,                                   --+ positive and negative xyz
+        clo_nav_s_abs = nil,                                --* absolute value of distance
+        clo_eloc = nil,                                     --+ positive and negative xyz
+        clo_nav_e = nil,                                    --* positive and negative xyz
+        clo_nav_e_abs = nil,                                --+ absolute value of distance
+           --- furthest position from the start
+           --- furthest position from the end
+        fur_sloc = nil,                                     --* positive and negative xyz
+        fur_nav_s = nil,                                    --+ positive and negative xyz
+        fur_nav_s_abs = nil,                                --* absolute value of distance
+        fur_eloc = nil,                                     --+ positive and negative xyz
+        fur_nav_e = nil,                                    --* positive and negative xyz
+        fur_nav_e_abs = nil                                 --+ absolute value of distance
     },
 --                                                                                                                                                 <>
         --| Back
@@ -464,43 +464,43 @@ if turtle then
             --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
             --- halt cardinal direction from start
             --- halt cardinal direction from end
-        dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+        dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
             --- This is the xyz when we encountered a block and now we have halted. position halt
             --- distance from the staring position to the halt position. And absolute version
             --- distance from the end position to the halt position. And absolute version
             --- distance from the halt position to the start position
             --- distance from the halt position to the end
-        hloc = nil,                                         --* positive and negative xyz
-        hs_nav = nil,                                       --+ positive and negative xyz
-        hs_nav_abs = nil,                                   --* absolute value of distance
-        he_nav = nil,                                       --+ positive and negative xyz
-        he_nav_abs = nil,                                   --* absolute value of distance
-        nav_sh = nil,                                       --+ positive and negative xyz
-        nav_sh_abs = nil,                                   --* absolute value of distance
-        nav_he = nil,                                       --+ positive and negative xyz
-        nav_he_abs = nil,                                   --* absolute value of distance
+        hloc = nil,                                         --+ positive and negative xyz
+        hs_nav = nil,                                       --* positive and negative xyz
+        hs_nav_abs = nil,                                   --+ absolute value of distance
+        he_nav = nil,                                       --* positive and negative xyz
+        he_nav_abs = nil,                                   --+ absolute value of distance
+        nav_sh = nil,                                       --* positive and negative xyz
+        nav_sh_abs = nil,                                   --+ absolute value of distance
+        nav_he = nil,                                       --* positive and negative xyz
+        nav_he_abs = nil,                                   --+ absolute value of distance
         --| dynamic variables for our relation with halt
             --- distance we are from the halt position
-        h_nav_c = nil,                                      --+ positive and negative xyz
-        h_nav_c_abs = nil,                                  --* absolute value of distance
+        h_nav_c = nil,                                      --* positive and negative xyz
+        h_nav_c_abs = nil,                                  --+ absolute value of distance
             --- closest position to start 
             --- closest position to end 
-        clos_sloc = nil,                                    --+ positive and negative xyz
-        clos_nav_s = nil,                                   --* positive and negative xyz
-        clo_nav_s_abs = nil,                                --+ absolute value of distance
-        clo_eloc = nil,                                     --* positive and negative xyz
-        clo_nav_e = nil,                                    --+ positive and negative xyz
-        clo_nav_e_abs = nil,                                --* absolute value of distance
+        clos_sloc = nil,                                    --* positive and negative xyz
+        clos_nav_s = nil,                                   --+ positive and negative xyz
+        clo_nav_s_abs = nil,                                --* absolute value of distance
+        clo_eloc = nil,                                     --+ positive and negative xyz
+        clo_nav_e = nil,                                    --* positive and negative xyz
+        clo_nav_e_abs = nil,                                --+ absolute value of distance
            --- furthest position from the start
            --- furthest position from the end
-        fur_sloc = nil,                                     --+ positive and negative xyz
-        fur_nav_s = nil,                                    --* positive and negative xyz
-        fur_nav_s_abs = nil,                                --+ absolute value of distance
-        fur_eloc = nil,                                     --* positive and negative xyz
-        fur_nav_e = nil,                                    --+ positive and negative xyz
-        fur_nav_e_abs = nil                                --* absolute value of distance
+        fur_sloc = nil,                                     --* positive and negative xyz
+        fur_nav_s = nil,                                    --+ positive and negative xyz
+        fur_nav_s_abs = nil,                                --* absolute value of distance
+        fur_eloc = nil,                                     --+ positive and negative xyz
+        fur_nav_e = nil,                                    --* positive and negative xyz
+        fur_nav_e_abs = nil                                --+ absolute value of distance
     }
     }
 end
