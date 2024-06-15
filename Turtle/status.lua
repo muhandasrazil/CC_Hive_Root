@@ -63,58 +63,58 @@ if turtle then
                 --- key order is to allow us to work in the correct order in a for loop
             key_order = {"total","pos_x","pos_y","pos_z","neg_x","neg_y","neg_z","north","south","east","west","up","down","left","right","forward","back"},
                 --- Total movements performed
-            total = nil,
+            total = 0,
                 --- Movement of axis. This would be if the previous position = current position +-1.
-            pos_x = nil,
-            pos_y = nil,
-            pos_z = nil,
-            neg_x = nil,
-            neg_y = nil,
-            neg_z = nil,
+            pos_x = 0,
+            pos_y = 0,
+            pos_z = 0,
+            neg_x = 0,
+            neg_y = 0,
+            neg_z = 0,
                 --- Movement of cardinal direction.
-            north = nil,
-            south = nil,
-            east = nil,
-            west = nil,
+            north = 0,
+            south = 0,
+            east = 0,
+            west = 0,
                 --- Movement of direction. This is the direction syntax for go(direction)
-            up = nil,
-            down = nil,
-            left = nil,
-            right = nil,
-            forward = nil,
-            back = nil,
+            up = 0,
+            down = 0,
+            left = 0,
+            right = 0,
+            forward = 0,
+            back = 0,
         },
             --- Detect actions
         detect = {
                 --- key order is to allow us to work in the correct order in a for loop
             key_order = {"total","up","down","forward"},
                 --- Total detections made
-            total = nil,
+            total = 0,
                 --- detections made in direction
-            up = nil,
-            down = nil,
-            forward = nil,
+            up = 0,
+            down = 0,
+            forward = 0,
         },
         --| Total times a thing happened. variables, functions called, updates maybe.
         vars = {
                 --- key order is to allow us to work in the correct order in a for loop
             key_order = {"tru","fls","go","up","down","forward","larg_x","larg_y","larg_z","smal_x","smal_y","smal_z"},
                 --- Total number of times go returned a true or false
-            tru = nil,
-            fls = nil,
+            tru = 0,
+            fls = 0,
                 --- Total number of times go is called.
                 --- Total number of times a direction is called. This is for things after we detect. 
-            go = nil,
-            up = nil,
-            down = nil,
-            forward = nil,
+            go = 0,
+            up = 0,
+            down = 0,
+            forward = 0,
                 --- The xyz boundries. Largest xyz, smallest xyz. Fun to have if we end up at world height
-            larg_x = nil,
-            larg_y = nil,
-            larg_z = nil,
-            smal_x = nil,
-            smal_y = nil,
-            smal_z = nil,
+            larg_x = 0,
+            larg_y = 0,
+            larg_z = 0,
+            smal_x = 0,
+            smal_y = 0,
+            smal_z = 0,
         },
     },
 --                                                                                                                                                 <>

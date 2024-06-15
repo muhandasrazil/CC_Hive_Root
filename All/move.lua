@@ -36,19 +36,46 @@ end
 function log_movement(direction)
     if direction == 'up' then
         status.pcTable[status.me].location.y = status.pcTable[status.me].location.y +1
+        move.update_move(false,{1,2,4,5,6,7,8,9,10,11,13,14,15,16,17})                      --+ 3|pos_y - 12|up
+        move.update_vars(false,{1,2,3,5,6,7,8,9,10,11,12})                                  --* 4|up
     elseif direction == 'down' then
         status.pcTable[status.me].location.y = status.pcTable[status.me].location.y -1
+        move.update_move(false,{1,2,3,4,5,7,8,9,10,11,12,14,15,16,17})                      --+ 6|neg_y - 13|down
+        move.update_vars(false,{1,2,3,4,6,7,8,9,10,11,12})                                  --* 5|down
     elseif direction == 'forward' then
         bump = status.bumps[status.pcTable[status.me].orientation]
         status.pcTable[status.me].location = {x = status.pcTable[status.me].location.x + bump[1], y = status.pcTable[status.me].location.y + bump[2], z = status.pcTable[status.me].location.z + bump[3]}
+        if status.pcTable[status.me].orientation == 'north' then
+            move.update_move(false,{1,2,3,4,5,6,9,10,11,12,13,14,15,17})                    --+ 7|neg_z - 8|north - 16|forward
+        elseif status.pcTable[status.me].orientation == 'south' then
+            move.update_move(false,{1,2,3,5,6,7,8,10,11,12,13,14,15,17})                    --+ 4|pos_z - 9|south - 16|forward
+        elseif status.pcTable[status.me].orientation == 'east' then
+            move.update_move(false,{1,3,4,5,6,7,8,9,11,12,13,14,15,17})                     --+ 2|pos_x - 10|east - 16|forward
+        elseif status.pcTable[status.me].orientation == 'west' then
+            move.update_move(false,{1,2,3,4,6,7,8,9,10,12,13,14,15,17})                     --+ 5|neg_x - 11|west - 16|forward
+        end
+        move.update_vars(false,{1,2,3,4,5,7,8,9,10,11,12})                                  --+ 6|forward
     elseif direction == 'back' then
         bump = status.bumps[status.pcTable[status.me].orientation]
         status.pcTable[status.me].location = {x = status.pcTable[status.me].location.x - bump[1], y = status.pcTable[status.me].location.y - bump[2], z = status.pcTable[status.me].location.z - bump[3]}
+        if status.pcTable[status.me].orientation == 'north' then
+            move.update_move(false,{1,2,3,5,6,7,8,10,11,12,13,14,15,16})                    --* 4|pos_z - 9|south - 17|back
+        elseif status.pcTable[status.me].orientation == 'south' then
+            move.update_move(false,{1,2,3,4,5,6,9,10,11,12,13,14,15,16})                    --* 7|neg_z - 8|north - 17|back
+        elseif status.pcTable[status.me].orientation == 'east' then
+            move.update_move(false,{1,2,3,4,6,7,8,9,10,12,13,14,15,16})                     --* 5|neg_x - 11|west - 17|back
+        elseif status.pcTable[status.me].orientation == 'west' then
+            move.update_move(false,{1,3,4,5,6,7,8,9,11,12,13,14,15,16})                     --* 2|pos_x - 10|east - 17|back
+        end
     elseif direction == 'left' then
         status.pcTable[status.me].orientation = status.left_shift[status.pcTable[status.me].orientation]
+        move.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17})                    --* 14|left
     elseif direction == 'right' then
         status.pcTable[status.me].orientation = status.right_shift[status.pcTable[status.me].orientation]
+        move.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17})                    --+ 15|right
     end
+    move.update_move(false,{2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17})                       --+ 1|total
+    move.update_vars(false,{1,2,3,4,5,6})                                                   --* 7,8,9|larg_x,y,z - 10,11,12|smal_x,y,z
     return true
 end
 function print_going_status(t)
@@ -89,127 +116,119 @@ function print_going_status(t)
         print()
     end
 end
+--| Just making a simple way to update the largest and smallest xyz values.
+--| If I fill out these variables like a check list I can do fun things later maybe
+function first_min_max_xyz()
+    status.going.stats.vars.larg_x = status.pcTable[status.me].location.x
+    actions.updateStateValue("stats_vars_larg_x",status.pcTable[status.me].location.x)
+    status.going.stats.vars.larg_y = status.pcTable[status.me].location.y
+    actions.updateStateValue("stats_vars_larg_y",status.pcTable[status.me].location.y)
+    status.going.stats.vars.larg_z = status.pcTable[status.me].location.z
+    actions.updateStateValue("stats_vars_larg_z",status.pcTable[status.me].location.z)
+    status.going.stats.vars.smal_x = status.pcTable[status.me].location.x
+    actions.updateStateValue("stats_vars_smal_x",status.pcTable[status.me].location.x)
+    status.going.stats.vars.smal_y = status.pcTable[status.me].location.y
+    actions.updateStateValue("stats_vars_smal_y",status.pcTable[status.me].location.y)
+    status.going.stats.vars.smal_z = status.pcTable[status.me].location.z
+    actions.updateStateValue("stats_vars_smal_z",status.pcTable[status.me].location.z)
+end
 -- use the point a to point b system for the location information
 -- this is to calculate which cardinal direction turtle must go to get to point B from point A
 function d_math(pointA_xyz,pointB_xyz)
     local nx
     local ny
     local nz
-    if pointA_xyz.x > pointB_xyz.x then
-        nx = 'west'
-    elseif pointA_xyz.x < pointB_xyz.x then
-        nx = 'east'
-    else
-        nx = 'axis'
-    end
-    if pointA_xyz.y > pointB_xyz.y then
-        ny = 'down'
-    elseif pointA_xyz.y < pointB_xyz.y then
-        ny = 'up'
-    else
-        ny = 'axis'
-    end
-    if pointA_xyz.z > pointB_xyz.z then
-        nz = 'north'
-    elseif pointA_xyz.z < pointB_xyz.z then
-        nz = 'south'
-    else
-        nz = 'axis'
-    end
+    if pointA_xyz.x > pointB_xyz.x then nx = 'west' elseif pointA_xyz.x < pointB_xyz.x then nx = 'east' else nx = 'axis' end
+    if pointA_xyz.y > pointB_xyz.y then ny = 'down' elseif pointA_xyz.y < pointB_xyz.y then ny = 'up' else ny = 'axis' end
+    if pointA_xyz.z > pointB_xyz.z then nz = 'north' elseif pointA_xyz.z < pointB_xyz.z then nz = 'south' else nz = 'axis' end
     return {x = nx, y = ny, z = nz}
 end
 function update_move(print, skp_lst)
+    -- move.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17})
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
     local function setAndUpdate(key, value) status.going.stats.move[key] = value actions.updateStateValue("stats_move_" .. key, value) end
     local key_order = status.going.stats.move.key_order
     local updates = {
-        --- total
-        function() setAndUpdate(key_order[1], nil) end,
-        --- pos_x
-        function() setAndUpdate(key_order[2], nil) end,
-        --- pos_y
-        function() setAndUpdate(key_order[3], nil) end,
-        --- pos_z
-        function() setAndUpdate(key_order[4], nil) end,
-        --- neg_x
-        function() setAndUpdate(key_order[5], nil) end,
-        --- neg_y
-        function() setAndUpdate(key_order[6], nil) end,
-        --- neg_z
-        function() setAndUpdate(key_order[7], nil) end,
-        --- north
-        function() setAndUpdate(key_order[8], nil) end,
-        --- south
-        function() setAndUpdate(key_order[9], nil) end,
-        --- east
-        function() setAndUpdate(key_order[10], nil) end,
-        --- west
-        function() setAndUpdate(key_order[11], nil) end,
-        --- up
-        function() setAndUpdate(key_order[12], nil) end,
-        --- down
-        function() setAndUpdate(key_order[13], nil) end,
-        --- left
-        function() setAndUpdate(key_order[14], nil) end,
-        --- right
-        function() setAndUpdate(key_order[15], nil) end,
-        --- forward
-        function() setAndUpdate(key_order[16], nil) end,
-        --- back
-        function() setAndUpdate(key_order[17], nil) end,
+        function() setAndUpdate(key_order[1], status.going.stats.move.total + 1) end,       --+ 1|total
+        function() setAndUpdate(key_order[2], status.going.stats.move.pos_x + 1) end,       --* 2|pos_x
+        function() setAndUpdate(key_order[3], status.going.stats.move.pos_y + 1) end,       --+ 3|pos_y
+        function() setAndUpdate(key_order[4], status.going.stats.move.pos_z + 1) end,       --* 4|pos_z
+        function() setAndUpdate(key_order[5], status.going.stats.move.neg_x + 1) end,       --+ 5|neg_x
+        function() setAndUpdate(key_order[6], status.going.stats.move.neg_y + 1) end,       --* 6|neg_y
+        function() setAndUpdate(key_order[7], status.going.stats.move.neg_z + 1) end,       --+ 7|neg_z
+        function() setAndUpdate(key_order[8], status.going.stats.move.north + 1) end,       --* 8|north
+        function() setAndUpdate(key_order[9], status.going.stats.move.south + 1) end,       --+ 9|south
+        function() setAndUpdate(key_order[10], status.going.stats.move.east + 1) end,       --* 10|east
+        function() setAndUpdate(key_order[11], status.going.stats.move.west + 1) end,       --+ 11|west
+        function() setAndUpdate(key_order[12], status.going.stats.move.up + 1) end,         --* 12|up
+        function() setAndUpdate(key_order[13], status.going.stats.move.down + 1) end,       --+ 13|down
+        function() setAndUpdate(key_order[14], status.going.stats.move.left + 1) end,       --* 14|left
+        function() setAndUpdate(key_order[15], status.going.stats.move.right + 1) end,      --+ 15|right
+        function() setAndUpdate(key_order[16], status.going.stats.move.forward + 1) end,    --* 16|forward
+        function() setAndUpdate(key_order[17], status.going.stats.move.back + 1) end,       --+ 17|back
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
-    if print then move.print_going_status('stats') end
+    if print then move.print_going_status('stats.move') end
 end
 function update_detect(print, skp_lst)
+    -- move.update_detect(false,{1,2,3,4})
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
     local function setAndUpdate(key, value) status.going.stats.detect[key] = value; actions.updateStateValue("stats_detect_" .. key, value) end
     local key_order = status.going.stats.detect.key_order
     local updates = {
-        --- total
-        function() setAndUpdate(key_order[1], nil) end,
-        --- up
-        function() setAndUpdate(key_order[2], nil) end,
-        --- down
-        function() setAndUpdate(key_order[3], nil) end,
-        --- forward
-        function() setAndUpdate(key_order[4], nil) end,
+        function() setAndUpdate(key_order[1], status.going.stats.detect.total + 1) end,     --+ 1|total
+        function() setAndUpdate(key_order[2], status.going.stats.detect.up + 1) end,        --* 2|up
+        function() setAndUpdate(key_order[3], status.going.stats.detect.down + 1) end,      --+ 3|down
+        function() setAndUpdate(key_order[4], status.going.stats.detect.forward + 1) end,   --* 4|forward
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
     if print then move.print_going_status('stats.detect') end
 end
 function update_vars(print, skp_lst)
+    -- move.update_vars(false,{1,2,3,4,5,6,7,8,9,10,11,12})
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
     local function setAndUpdate(key, value) status.going.stats.vars[key] = value; actions.updateStateValue("stats_vars_" .. key, value) end
     local key_order = status.going.stats.vars.key_order
     local updates = {
-        --- tru
-        function() setAndUpdate(key_order[1], nil) end,
-        --- fls
-        function() setAndUpdate(key_order[2], nil) end,
-        --- go
-        function() setAndUpdate(key_order[3], nil) end,
-        --- up
-        function() setAndUpdate(key_order[4], nil) end,
-        --- down
-        function() setAndUpdate(key_order[5], nil) end,
-        --- forward
-        function() setAndUpdate(key_order[6], nil) end,
-        --- larg_x
-        function() setAndUpdate(key_order[7], nil) end,
-        --- larg_y
-        function() setAndUpdate(key_order[8], nil) end,
-        --- larg_z
-        function() setAndUpdate(key_order[9], nil) end,
-        --- smal_x
-        function() setAndUpdate(key_order[10], nil) end,
-        --- smal_y
-        function() setAndUpdate(key_order[11], nil) end,
-        --- smal_z
-        function() setAndUpdate(key_order[12], nil) end,
+        function() setAndUpdate(key_order[1], status.going.stats.vars.tru + 1) end,         --* 1|tru
+        function() setAndUpdate(key_order[2], status.going.stats.vars.fls + 1) end,         --+ 2|fls
+        function() setAndUpdate(key_order[3], status.going.stats.vars.go + 1) end,          --* 3|go
+        function() setAndUpdate(key_order[4], status.going.stats.vars.up + 1) end,          --+ 4|up
+        function() setAndUpdate(key_order[5], status.going.stats.vars.down + 1) end,        --* 5|down
+        function() setAndUpdate(key_order[6], status.going.stats.vars.forward + 1) end,     --+ 6|forward
+        function()
+            if status.pcTable[status.me].location.x > status.going.stats.vars.larg_x then
+                setAndUpdate(key_order[7], status.pcTable[status.me].location.x)            --* 7|larg_x
+            end
+        end,
+        function()
+            if status.pcTable[status.me].location.y > status.going.stats.vars.larg_y then
+                setAndUpdate(key_order[8], status.pcTable[status.me].location.y)            --+ 8|larg_y
+            end
+        end,
+        function()
+            if status.pcTable[status.me].location.z > status.going.stats.vars.larg_z then
+                setAndUpdate(key_order[9], status.pcTable[status.me].location.z)            --* 9|larg_z
+            end
+        end,
+        function()
+            if status.pcTable[status.me].location.x < status.going.stats.vars.smal_x then
+                setAndUpdate(key_order[10], status.pcTable[status.me].location.x)           --+ 10|smal_x
+            end
+        end,
+        function()
+            if status.pcTable[status.me].location.y < status.going.stats.vars.smal_y then
+                setAndUpdate(key_order[11], status.pcTable[status.me].location.y)           --* 11|smal_y
+            end
+        end,
+        function()
+            if status.pcTable[status.me].location.z < status.going.stats.vars.smal_z then
+                setAndUpdate(key_order[12], status.pcTable[status.me].location.z)           --+ 12|smal_z
+            end
+        end,
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
     if print then move.print_going_status('stats.vars') end
@@ -653,7 +672,7 @@ function go_to(end_location, end_orientation, path)
     sleep(2)
     status.going.endloc = end_location
     move.update_static(end_location, path, false, {})
-    read()
+    move.first_min_max_xyz()
     local function reached_destination()
         for axis in path:gmatch('.') do
             if status.pcTable[status.me].location[axis] ~= end_location[axis] then
@@ -710,13 +729,20 @@ function go_to_axis(axis)
 end
 function go(direction)
     if (direction == 'forward' and status.detect[direction]()) then
+        move.update_detect(false,{2,3})                                                     --* 1|total - 4|forward
+        move.update_vars(false,{1,3,4,5,6,7,8,9,10,11,12})                                  --+ 2|fls
         return false
     elseif (direction == 'up' and status.detect[direction]()) then
+        move.update_detect(false,{3,4})                                                     --* 1|total - 2|up
+        move.update_vars(false,{1,3,4,5,6,7,8,9,10,11,12})                                  --+ 2|fls
         return false
     elseif (direction == 'down' and status.detect[direction]()) then
+        move.update_detect(false,{2,4})                                                     --* 1|total - 3|down
+        move.update_vars(false,{1,3,4,5,6,7,8,9,10,11,12})                                  --+ 2|fls
         return false
     end
     move.move_log(direction)
+    move.update_vars(false,{2,4,5,6,7,8,9,10,11,12})                                        --+ 1|tru - 3|go
     return true
 end
 -- section for checking directings if forward is blocked

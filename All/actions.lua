@@ -316,23 +316,23 @@ local function update_move(skp_lst)
     local function setAndUpdate(key, value) status.going.stats.move[key] = value actions.updateStateValue("stats_move_" .. key, value) end
     local key_order = status.going.stats.move.key_order
     local updates = {
-        function() setAndUpdate(key_order[1], nil) end,
-        function() setAndUpdate(key_order[2], nil) end,
-        function() setAndUpdate(key_order[3], nil) end,
-        function() setAndUpdate(key_order[4], nil) end,
-        function() setAndUpdate(key_order[5], nil) end,
-        function() setAndUpdate(key_order[6], nil) end,
-        function() setAndUpdate(key_order[7], nil) end,
-        function() setAndUpdate(key_order[8], nil) end,
-        function() setAndUpdate(key_order[9], nil) end,
-        function() setAndUpdate(key_order[10], nil) end,
-        function() setAndUpdate(key_order[11], nil) end,
-        function() setAndUpdate(key_order[12], nil) end,
-        function() setAndUpdate(key_order[13], nil) end,
-        function() setAndUpdate(key_order[14], nil) end,
-        function() setAndUpdate(key_order[15], nil) end,
-        function() setAndUpdate(key_order[16], nil) end,
-        function() setAndUpdate(key_order[17], nil) end,
+        function() setAndUpdate(key_order[1], 0) end,
+        function() setAndUpdate(key_order[2], 0) end,
+        function() setAndUpdate(key_order[3], 0) end,
+        function() setAndUpdate(key_order[4], 0) end,
+        function() setAndUpdate(key_order[5], 0) end,
+        function() setAndUpdate(key_order[6], 0) end,
+        function() setAndUpdate(key_order[7], 0) end,
+        function() setAndUpdate(key_order[8], 0) end,
+        function() setAndUpdate(key_order[9], 0) end,
+        function() setAndUpdate(key_order[10], 0) end,
+        function() setAndUpdate(key_order[11], 0) end,
+        function() setAndUpdate(key_order[12], 0) end,
+        function() setAndUpdate(key_order[13], 0) end,
+        function() setAndUpdate(key_order[14], 0) end,
+        function() setAndUpdate(key_order[15], 0) end,
+        function() setAndUpdate(key_order[16], 0) end,
+        function() setAndUpdate(key_order[17], 0) end,
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
 end
@@ -342,10 +342,10 @@ local function update_detect(skp_lst)
     local function setAndUpdate(key, value) status.going.stats.detect[key] = value; actions.updateStateValue("stats_detect_" .. key, value) end
     local key_order = status.going.stats.detect.key_order
     local updates = {
-        function() setAndUpdate(key_order[1], nil) end,
-        function() setAndUpdate(key_order[2], nil) end,
-        function() setAndUpdate(key_order[3], nil) end,
-        function() setAndUpdate(key_order[4], nil) end,
+        function() setAndUpdate(key_order[1], 0) end,
+        function() setAndUpdate(key_order[2], 0) end,
+        function() setAndUpdate(key_order[3], 0) end,
+        function() setAndUpdate(key_order[4], 0) end,
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
 end
@@ -355,18 +355,18 @@ local function update_vars(skp_lst)
     local function setAndUpdate(key, value) status.going.stats.vars[key] = value; actions.updateStateValue("stats_vars_" .. key, value) end
     local key_order = status.going.stats.vars.key_order
     local updates = {
-        function() setAndUpdate(key_order[1], nil) end,
-        function() setAndUpdate(key_order[2], nil) end,
-        function() setAndUpdate(key_order[3], nil) end,
-        function() setAndUpdate(key_order[4], nil) end,
-        function() setAndUpdate(key_order[5], nil) end,
-        function() setAndUpdate(key_order[6], nil) end,
-        function() setAndUpdate(key_order[7], nil) end,
-        function() setAndUpdate(key_order[8], nil) end,
-        function() setAndUpdate(key_order[9], nil) end,
-        function() setAndUpdate(key_order[10], nil) end,
-        function() setAndUpdate(key_order[11], nil) end,
-        function() setAndUpdate(key_order[12], nil) end,
+        function() setAndUpdate(key_order[1], 0) end,
+        function() setAndUpdate(key_order[2], 0) end,
+        function() setAndUpdate(key_order[3], 0) end,
+        function() setAndUpdate(key_order[4], 0) end,
+        function() setAndUpdate(key_order[5], 0) end,
+        function() setAndUpdate(key_order[6], 0) end,
+        function() setAndUpdate(key_order[7], 0) end,
+        function() setAndUpdate(key_order[8], 0) end,
+        function() setAndUpdate(key_order[9], 0) end,
+        function() setAndUpdate(key_order[10], 0) end,
+        function() setAndUpdate(key_order[11], 0) end,
+        function() setAndUpdate(key_order[12], 0) end,
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
 end
@@ -620,11 +620,11 @@ local function update_bck(skp_lst)
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
 end
+update_move({})
+update_detect({})
+update_vars({})
 update_static({})
-update_dynmc({})
---update_move({})
---update_detect({})
---update_vars({})
+--update_dynmc({})
 --update_fwd({})
 --update_up({})
 --update_dwn({})
