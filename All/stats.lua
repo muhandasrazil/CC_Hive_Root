@@ -102,24 +102,24 @@ going = {
                 --- key order is to allow us to work in the correct order in a for loop
             key_order = {"sloc","eloc","sloc_nav","sloc_nav_abs","eloc_nav","eloc_nav_abs","nav_priority_input","sdir","edir"},
                 --- starting location xyz
-            sloc = nil,                                         --* positive and negative xyz
+            sloc = nil,                                         --+ positive and negative xyz
                 --- end locaiton xyz
-            eloc = nil,                                         --* positive and negative xyz
+            eloc = nil,                                         --+ positive and negative xyz
                 --- optimal pathing that the turtle records on start
                 --- strtloc optimal is the xyz turtle thinks it needs to go
                 --- strtloc optimal abs is the absolute the turtle thinks it needs to go.
-            sloc_nav = nil,                                     --* positive and negative xyz
-            sloc_nav_abs = nil,                                 --+ absolute value of distance
+            sloc_nav = nil,                                     --+ positive and negative xyz
+            sloc_nav_abs = nil,                                 --* absolute value of distance
                 --- endloc optimal is the xyz distance to be traveled from the perspective of the end destination
                 --- endloc optimal abs is the absolute value the end thinks the turtle should go
-            eloc_nav = nil,                                     --* positive and negative xyz
-            eloc_nav_abs = nil,                                 --+ absolute value of distance
+            eloc_nav = nil,                                     --+ positive and negative xyz
+            eloc_nav_abs = nil,                                 --* absolute value of distance
                 --- storing strings for the nav priority and the compass directions
-            nav_priority_input = nil,                           --+ STRING
+            nav_priority_input = nil,                           --* STRING
                 --- cardinal direction start to end
                 --- cardinal direction end to start
-            sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            edir = nil                                          --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            edir = nil                                          --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
         },
     --                                                                                                                                                 <>
             --| Mapping the dynamic distance for the turtle movement directly. This is outside of the Maze solver
@@ -129,28 +129,28 @@ going = {
                 --- This is to record the where in the world we are. sanity check against the API "status.pctable[who_am_i.my_id].location"
                 --- now dist is the xyz of the distance from right now to the end. sanity check against static
                 --- now dist abs is the distance we have left to go to get to the end position.
-            slocn = nil,                                        --+ positive and negative xyz
-            slocn_nav = nil,                                    --* positive and negative xyz
-            slocn_nav_abs = nil,                                --+ absolute value of distance
+            slocn = nil,                                        --* positive and negative xyz
+            slocn_nav = nil,                                    --+ positive and negative xyz
+            slocn_nav_abs = nil,                                --* absolute value of distance
                 --- this records where the end location is. Use to sanity check against the end location static. 
                 --- now dist is where we THINK the end destination is. Used as sanity check to compare against static.
                 --- now dist abs is the absolute of how far away we are from the end destination. Used as comparison for sanity check
-            elocn = nil,                                        --+ positive and negative xyz
-            elocn_nav = nil,                                    --* positive and negative xyz
-            elocn_nav_abs = nil,                                --+ absolute value of distance
+            elocn = nil,                                        --* positive and negative xyz
+            elocn_nav = nil,                                    --+ positive and negative xyz
+            elocn_nav_abs = nil,                                --* absolute value of distance
                 --- Tracking the actual movement the turle has made. 
                 --- Dist by axis is the xyz real world we have gone. +x will increment x, -x will decrement x
                 --- dist by axis abs is the total times the turtle moves ever by the axis.
-            nav = nil,                                          --+ positive and negative xyz
-            nav_abs = nil,                                      --* absolute value of distance
+            nav = nil,                                          --* positive and negative xyz
+            nav_abs = nil,                                      --+ absolute value of distance
                 --- cardinal direction we are currently facing
                 --- cardinal direction from now to start
                 --- cardinal direction from now to end
                 --- axis we are currently on
-            dirn = nil,                                         --+ STRING
-            sdirn = nil,                                        --* STRING
-            edirn = nil,                                        --+ STRING
-            axisn = nil                                         --* STRING
+            dirn = nil,                                         --* STRING
+            sdirn = nil,                                        --+ STRING
+            edirn = nil,                                        --* STRING
+            axisn = nil                                         --+ STRING
         },
     --                                                                                                                                                 <>
             --| Recording the information to detect when we have encountered a block
@@ -165,43 +165,43 @@ going = {
                 --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
                 --- halt cardinal direction from start
                 --- halt cardinal direction from end
-            dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+            dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
                 --- This is the xyz when we encountered a block and now we have halted. position halt
                 --- distance from the staring position to the halt position. And absolute version
                 --- distance from the end position to the halt position. And absolute version
                 --- distance from the halt position to the start position
                 --- distance from the halt position to the end
-            hloc = nil,                                         --+ positive and negative xyz
-            hs_nav = nil,                                       --* positive and negative xyz
-            hs_nav_abs = nil,                                   --+ absolute value of distance
-            he_nav = nil,                                       --* positive and negative xyz
-            he_nav_abs = nil,                                   --+ absolute value of distance
-            nav_sh = nil,                                       --* positive and negative xyz
-            nav_sh_abs = nil,                                   --+ absolute value of distance
-            nav_he = nil,                                       --* positive and negative xyz
-            nav_he_abs = nil,                                   --+ absolute value of distance
+            hloc = nil,                                         --* positive and negative xyz
+            hs_nav = nil,                                       --+ positive and negative xyz
+            hs_nav_abs = nil,                                   --* absolute value of distance
+            he_nav = nil,                                       --+ positive and negative xyz
+            he_nav_abs = nil,                                   --* absolute value of distance
+            nav_sh = nil,                                       --+ positive and negative xyz
+            nav_sh_abs = nil,                                   --* absolute value of distance
+            nav_he = nil,                                       --+ positive and negative xyz
+            nav_he_abs = nil,                                   --* absolute value of distance
             --| dynamic variables for our relation with halt
                 --- distance we are from the halt position
-            h_nav_c = nil,                                      --* positive and negative xyz
-            h_nav_c_abs = nil,                                  --+ absolute value of distance
+            h_nav_c = nil,                                      --+ positive and negative xyz
+            h_nav_c_abs = nil,                                  --* absolute value of distance
                 --- closest position to start 
                 --- closest position to end 
-            clos_sloc = nil,                                    --* positive and negative xyz
-            clos_nav_s = nil,                                   --+ positive and negative xyz
-            clo_nav_s_abs = nil,                                --* absolute value of distance
-            clo_eloc = nil,                                     --+ positive and negative xyz
-            clo_nav_e = nil,                                    --* positive and negative xyz
-            clo_nav_e_abs = nil,                                --+ absolute value of distance
+            clos_sloc = nil,                                    --+ positive and negative xyz
+            clos_nav_s = nil,                                   --* positive and negative xyz
+            clo_nav_s_abs = nil,                                --+ absolute value of distance
+            clo_eloc = nil,                                     --* positive and negative xyz
+            clo_nav_e = nil,                                    --+ positive and negative xyz
+            clo_nav_e_abs = nil,                                --* absolute value of distance
                --- furthest position from the start
                --- furthest position from the end
-            fur_sloc = nil,                                     --* positive and negative xyz
-            fur_nav_s = nil,                                    --+ positive and negative xyz
-            fur_nav_s_abs = nil,                                --* absolute value of distance
-            fur_eloc = nil,                                     --+ positive and negative xyz
-            fur_nav_e = nil,                                    --* positive and negative xyz
-            fur_nav_e_abs = nil                                 --+ absolute value of distance
+            fur_sloc = nil,                                     --+ positive and negative xyz
+            fur_nav_s = nil,                                    --* positive and negative xyz
+            fur_nav_s_abs = nil,                                --+ absolute value of distance
+            fur_eloc = nil,                                     --* positive and negative xyz
+            fur_nav_e = nil,                                    --+ positive and negative xyz
+            fur_nav_e_abs = nil                                 --* absolute value of distance
         },
     --                                                                                                                                                 <>
             --| Up
@@ -214,43 +214,43 @@ going = {
                 --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
                 --- halt cardinal direction from start
                 --- halt cardinal direction from end
-            dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+            dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
                 --- This is the xyz when we encountered a block and now we have halted. position halt
                 --- distance from the staring position to the halt position. And absolute version
                 --- distance from the end position to the halt position. And absolute version
                 --- distance from the halt position to the start position
                 --- distance from the halt position to the end
-            hloc = nil,                                         --* positive and negative xyz
-            hs_nav = nil,                                       --+ positive and negative xyz
-            hs_nav_abs = nil,                                   --* absolute value of distance
-            he_nav = nil,                                       --+ positive and negative xyz
-            he_nav_abs = nil,                                   --* absolute value of distance
-            nav_sh = nil,                                       --+ positive and negative xyz
-            nav_sh_abs = nil,                                   --* absolute value of distance
-            nav_he = nil,                                       --+ positive and negative xyz
-            nav_he_abs = nil,                                   --* absolute value of distance
+            hloc = nil,                                         --+ positive and negative xyz
+            hs_nav = nil,                                       --* positive and negative xyz
+            hs_nav_abs = nil,                                   --+ absolute value of distance
+            he_nav = nil,                                       --* positive and negative xyz
+            he_nav_abs = nil,                                   --+ absolute value of distance
+            nav_sh = nil,                                       --* positive and negative xyz
+            nav_sh_abs = nil,                                   --+ absolute value of distance
+            nav_he = nil,                                       --* positive and negative xyz
+            nav_he_abs = nil,                                   --+ absolute value of distance
             --| dynamic variables for our relation with halt
                 --- distance we are from the halt position
-            h_nav_c = nil,                                      --+ positive and negative xyz
-            h_nav_c_abs = nil,                                  --* absolute value of distance
+            h_nav_c = nil,                                      --* positive and negative xyz
+            h_nav_c_abs = nil,                                  --+ absolute value of distance
                 --- closest position to start 
                 --- closest position to end 
-            clos_sloc = nil,                                    --+ positive and negative xyz
-            clos_nav_s = nil,                                   --* positive and negative xyz
-            clo_nav_s_abs = nil,                                --+ absolute value of distance
-            clo_eloc = nil,                                     --* positive and negative xyz
-            clo_nav_e = nil,                                    --+ positive and negative xyz
-            clo_nav_e_abs = nil,                                --* absolute value of distance
+            clos_sloc = nil,                                    --* positive and negative xyz
+            clos_nav_s = nil,                                   --+ positive and negative xyz
+            clo_nav_s_abs = nil,                                --* absolute value of distance
+            clo_eloc = nil,                                     --+ positive and negative xyz
+            clo_nav_e = nil,                                    --* positive and negative xyz
+            clo_nav_e_abs = nil,                                --+ absolute value of distance
                 --- furthest position from the start
                 --- furthest position from the end
-            fur_sloc = nil,                                     --+ positive and negative xyz
-            fur_nav_s = nil,                                    --* positive and negative xyz
-            fur_nav_s_abs = nil,                                --+ absolute value of distance
-            fur_eloc = nil,                                     --* positive and negative xyz
-            fur_nav_e = nil,                                    --+ positive and negative xyz
-            fur_nav_e_abs = nil                                 --* absolute value of distance
+            fur_sloc = nil,                                     --* positive and negative xyz
+            fur_nav_s = nil,                                    --+ positive and negative xyz
+            fur_nav_s_abs = nil,                                --* absolute value of distance
+            fur_eloc = nil,                                     --+ positive and negative xyz
+            fur_nav_e = nil,                                    --* positive and negative xyz
+            fur_nav_e_abs = nil                                 --+ absolute value of distance
         },
     --                                                                                                                                                 <>
             --| Down
@@ -263,55 +263,6 @@ going = {
                 --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
                 --- halt cardinal direction from start
                 --- halt cardinal direction from end
-            dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
-                --- This is the xyz when we encountered a block and now we have halted. position halt
-                --- distance from the staring position to the halt position. And absolute version
-                --- distance from the end position to the halt position. And absolute version
-                --- distance from the halt position to the start position
-                --- distance from the halt position to the end
-            hloc = nil,                                         --+ positive and negative xyz
-            hs_nav = nil,                                       --* positive and negative xyz
-            hs_nav_abs = nil,                                   --+ absolute value of distance
-            he_nav = nil,                                       --* positive and negative xyz
-            he_nav_abs = nil,                                   --+ absolute value of distance
-            nav_sh = nil,                                       --* positive and negative xyz
-            nav_sh_abs = nil,                                   --+ absolute value of distance
-            nav_he = nil,                                       --* positive and negative xyz
-            nav_he_abs = nil,                                   --+ absolute value of distance
-            --| dynamic variables for our relation with halt
-                --- distance we are from the halt position
-            h_nav_c = nil,                                      --* positive and negative xyz
-            h_nav_c_abs = nil,                                  --+ absolute value of distance
-                --- closest position to start 
-                --- closest position to end 
-            clos_sloc = nil,                                    --* positive and negative xyz
-            clos_nav_s = nil,                                   --+ positive and negative xyz
-            clo_nav_s_abs = nil,                                --* absolute value of distance
-            clo_eloc = nil,                                     --+ positive and negative xyz
-            clo_nav_e = nil,                                    --* positive and negative xyz
-            clo_nav_e_abs = nil,                                --+ absolute value of distance
-                --- furthest position from the start
-                --- furthest position from the end
-            fur_sloc = nil,                                     --* positive and negative xyz
-            fur_nav_s = nil,                                    --+ positive and negative xyz
-            fur_nav_s_abs = nil,                                --* absolute value of distance
-            fur_eloc = nil,                                     --+ positive and negative xyz
-            fur_nav_e = nil,                                    --* positive and negative xyz
-            fur_nav_e_abs = nil                                 --+ absolute value of distance
-        },
-    --                                                                                                                                                 <>
-            --| Left
-            --| Left will always require a turn command for movement.
-            --| The center point will be applied to the above forward, up, down and then mathed here
-            --| static variables for halt
-        lft = {
-                --- key order is to allow us to work in the correct order in a for loop
-            key_order = {"dirfc","sdir","edir","hloc","hs_nav","hs_nav_abs","he_nav","he_nav_abs","nav_sh","nav_sh_abs","nav_he","nav_he_abs","h_nav_c","h_nav_c_abs","clos_sloc","clos_nav_s","clo_nav_s_abs","clo_eloc","clo_nav_e","clo_nav_e_abs","fur_sloc","fur_nav_s","fur_nav_s_abs","fur_eloc","fur_nav_e","fur_nav_e_abs"},
-                --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
-                --- halt cardinal direction from start
-                --- halt cardinal direction from end
             dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
             sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
             edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
@@ -351,11 +302,11 @@ going = {
             fur_nav_e_abs = nil                                 --* absolute value of distance
         },
     --                                                                                                                                                 <>
-            --| Right
-            --| Right will always require a turn command for movement.
+            --| Left
+            --| Left will always require a turn command for movement.
             --| The center point will be applied to the above forward, up, down and then mathed here
             --| static variables for halt
-        rit = {
+        lft = {
                 --- key order is to allow us to work in the correct order in a for loop
             key_order = {"dirfc","sdir","edir","hloc","hs_nav","hs_nav_abs","he_nav","he_nav_abs","nav_sh","nav_sh_abs","nav_he","nav_he_abs","h_nav_c","h_nav_c_abs","clos_sloc","clos_nav_s","clo_nav_s_abs","clo_eloc","clo_nav_e","clo_nav_e_abs","fur_sloc","fur_nav_s","fur_nav_s_abs","fur_eloc","fur_nav_e","fur_nav_e_abs"},
                 --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
@@ -390,14 +341,63 @@ going = {
             clo_eloc = nil,                                     --+ positive and negative xyz
             clo_nav_e = nil,                                    --* positive and negative xyz
             clo_nav_e_abs = nil,                                --+ absolute value of distance
-               --- furthest position from the start
-               --- furthest position from the end
+                --- furthest position from the start
+                --- furthest position from the end
             fur_sloc = nil,                                     --* positive and negative xyz
             fur_nav_s = nil,                                    --+ positive and negative xyz
             fur_nav_s_abs = nil,                                --* absolute value of distance
             fur_eloc = nil,                                     --+ positive and negative xyz
             fur_nav_e = nil,                                    --* positive and negative xyz
             fur_nav_e_abs = nil                                 --+ absolute value of distance
+        },
+    --                                                                                                                                                 <>
+            --| Right
+            --| Right will always require a turn command for movement.
+            --| The center point will be applied to the above forward, up, down and then mathed here
+            --| static variables for halt
+        rit = {
+                --- key order is to allow us to work in the correct order in a for loop
+            key_order = {"dirfc","sdir","edir","hloc","hs_nav","hs_nav_abs","he_nav","he_nav_abs","nav_sh","nav_sh_abs","nav_he","nav_he_abs","h_nav_c","h_nav_c_abs","clos_sloc","clos_nav_s","clo_nav_s_abs","clo_eloc","clo_nav_e","clo_nav_e_abs","fur_sloc","fur_nav_s","fur_nav_s_abs","fur_eloc","fur_nav_e","fur_nav_e_abs"},
+                --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
+                --- halt cardinal direction from start
+                --- halt cardinal direction from end
+            dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+                --- This is the xyz when we encountered a block and now we have halted. position halt
+                --- distance from the staring position to the halt position. And absolute version
+                --- distance from the end position to the halt position. And absolute version
+                --- distance from the halt position to the start position
+                --- distance from the halt position to the end
+            hloc = nil,                                         --* positive and negative xyz
+            hs_nav = nil,                                       --+ positive and negative xyz
+            hs_nav_abs = nil,                                   --* absolute value of distance
+            he_nav = nil,                                       --+ positive and negative xyz
+            he_nav_abs = nil,                                   --* absolute value of distance
+            nav_sh = nil,                                       --+ positive and negative xyz
+            nav_sh_abs = nil,                                   --* absolute value of distance
+            nav_he = nil,                                       --+ positive and negative xyz
+            nav_he_abs = nil,                                   --* absolute value of distance
+            --| dynamic variables for our relation with halt
+                --- distance we are from the halt position
+            h_nav_c = nil,                                      --+ positive and negative xyz
+            h_nav_c_abs = nil,                                  --* absolute value of distance
+                --- closest position to start 
+                --- closest position to end 
+            clos_sloc = nil,                                    --+ positive and negative xyz
+            clos_nav_s = nil,                                   --* positive and negative xyz
+            clo_nav_s_abs = nil,                                --+ absolute value of distance
+            clo_eloc = nil,                                     --* positive and negative xyz
+            clo_nav_e = nil,                                    --+ positive and negative xyz
+            clo_nav_e_abs = nil,                                --* absolute value of distance
+               --- furthest position from the start
+               --- furthest position from the end
+            fur_sloc = nil,                                     --+ positive and negative xyz
+            fur_nav_s = nil,                                    --* positive and negative xyz
+            fur_nav_s_abs = nil,                                --+ absolute value of distance
+            fur_eloc = nil,                                     --* positive and negative xyz
+            fur_nav_e = nil,                                    --+ positive and negative xyz
+            fur_nav_e_abs = nil                                 --* absolute value of distance
         },
     --                                                                                                                                                 <>
             --| Back
@@ -411,50 +411,90 @@ going = {
                 --- Direction we were facing at the time we were halted. Used to determine: up,down,left,right,back.forward
                 --- halt cardinal direction from start
                 --- halt cardinal direction from end
-            dirfc = nil,                                        --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
-            edir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}    
+            dirfc = nil,                                        --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
+            edir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}    
                 --- This is the xyz when we encountered a block and now we have halted. position halt
                 --- distance from the staring position to the halt position. And absolute version
                 --- distance from the end position to the halt position. And absolute version
                 --- distance from the halt position to the start position
                 --- distance from the halt position to the end
-            hloc = nil,                                         --+ positive and negative xyz
-            hs_nav = nil,                                       --* positive and negative xyz
-            hs_nav_abs = nil,                                   --+ absolute value of distance
-            he_nav = nil,                                       --* positive and negative xyz
-            he_nav_abs = nil,                                   --+ absolute value of distance
-            nav_sh = nil,                                       --* positive and negative xyz
-            nav_sh_abs = nil,                                   --+ absolute value of distance
-            nav_he = nil,                                       --* positive and negative xyz
-            nav_he_abs = nil,                                   --+ absolute value of distance
+            hloc = nil,                                         --* positive and negative xyz
+            hs_nav = nil,                                       --+ positive and negative xyz
+            hs_nav_abs = nil,                                   --* absolute value of distance
+            he_nav = nil,                                       --+ positive and negative xyz
+            he_nav_abs = nil,                                   --* absolute value of distance
+            nav_sh = nil,                                       --+ positive and negative xyz
+            nav_sh_abs = nil,                                   --* absolute value of distance
+            nav_he = nil,                                       --+ positive and negative xyz
+            nav_he_abs = nil,                                   --* absolute value of distance
             --| dynamic variables for our relation with halt
                 --- distance we are from the halt position
-            h_nav_c = nil,                                      --* positive and negative xyz
-            h_nav_c_abs = nil,                                  --+ absolute value of distance
+            h_nav_c = nil,                                      --+ positive and negative xyz
+            h_nav_c_abs = nil,                                  --* absolute value of distance
                 --- closest position to start 
                 --- closest position to end 
-            clos_sloc = nil,                                    --* positive and negative xyz
-            clos_nav_s = nil,                                   --+ positive and negative xyz
-            clo_nav_s_abs = nil,                                --* absolute value of distance
-            clo_eloc = nil,                                     --+ positive and negative xyz
-            clo_nav_e = nil,                                    --* positive and negative xyz
-            clo_nav_e_abs = nil,                                --+ absolute value of distance
+            clos_sloc = nil,                                    --+ positive and negative xyz
+            clos_nav_s = nil,                                   --* positive and negative xyz
+            clo_nav_s_abs = nil,                                --+ absolute value of distance
+            clo_eloc = nil,                                     --* positive and negative xyz
+            clo_nav_e = nil,                                    --+ positive and negative xyz
+            clo_nav_e_abs = nil,                                --* absolute value of distance
                --- furthest position from the start
                --- furthest position from the end
-            fur_sloc = nil,                                     --* positive and negative xyz
-            fur_nav_s = nil,                                    --+ positive and negative xyz
-            fur_nav_s_abs = nil,                                --* absolute value of distance
-            fur_eloc = nil,                                     --+ positive and negative xyz
-            fur_nav_e = nil,                                    --* positive and negative xyz
-            fur_nav_e_abs = nil                                 --+ absolute value of distance
+            fur_sloc = nil,                                     --+ positive and negative xyz
+            fur_nav_s = nil,                                    --* positive and negative xyz
+            fur_nav_s_abs = nil,                                --+ absolute value of distance
+            fur_eloc = nil,                                     --* positive and negative xyz
+            fur_nav_e = nil,                                    --+ positive and negative xyz
+            fur_nav_e_abs = nil                                 --* absolute value of distance
         }
 }
+function updateStateStatsValue(stateKey, newValue)
+    local filename = "/state_stats"
+    local lines = {}
+    local found = false
+    local file = fs.open(filename, "r")
+    local newValueString
+    if type(newValue) == "string" then
+        newValueString = "'" .. newValue .. "'"
+    elseif type(newValue) == "table" then
+        if (type(newValue.x) == "string" or type(newValue.y) == "string" or type(newValue.z) == "string") then
+            newValueString = "{".."x = ".."'"..tostring(newValue.x).."'"..", y = ".."'"..tostring(newValue.y).."'"..", z = ".."'"..tostring(newValue.z).."'".."}"
+        else
+            newValueString = "{".."x = "..tostring(newValue.x)..", y = "..tostring(newValue.y)..", z = "..tostring(newValue.z).."}"
+        end
+    else
+        newValueString = tostring(newValue)
+    end
+    if file then
+        while true do
+            local line = file.readLine()
+            if line == nil then break end
+            if line:find("^" .. stateKey .. " =") then
+                line = stateKey .. " = " .. newValueString
+                found = true
+            end
+            table.insert(lines, line)
+        end
+        file.close()
+    end
+    if not found then
+        table.insert(lines, stateKey .. " = " .. newValueString)
+    end
+    file = fs.open(filename, "w")
+    if file then
+        for _, line in ipairs(lines) do
+            file.writeLine(line)
+        end
+        file.close()
+    end
+end
 function clear_all_stats()
     local function update_move(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.stats.move[key] = value actions.updateStateValue("stats_move_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.stats.move[key] = value stats.updateStateStatsValue("stats_move_" .. key, value) end
         local key_order = stats.going.stats.move.key_order
         local updates = {
             function() setAndUpdate(key_order[1], 0) end,
@@ -480,7 +520,7 @@ function clear_all_stats()
     local function update_detect(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.stats.detect[key] = value; actions.updateStateValue("stats_detect_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.stats.detect[key] = value; stats.updateStateStatsValue("stats_detect_" .. key, value) end
         local key_order = stats.going.stats.detect.key_order
         local updates = {
             function() setAndUpdate(key_order[1], 0) end,
@@ -493,7 +533,7 @@ function clear_all_stats()
     local function update_vars(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.stats.vars[key] = value; actions.updateStateValue("stats_vars_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.stats.vars[key] = value; stats.updateStateStatsValue("stats_vars_" .. key, value) end
         local key_order = stats.going.stats.vars.key_order
         local updates = {
             function() setAndUpdate(key_order[1], 0) end,
@@ -514,7 +554,7 @@ function clear_all_stats()
     local function update_static(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.static[key] = value actions.updateStateValue("static_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.static[key] = value stats.updateStateStatsValue("static_" .. key, value) end
         local key_order = stats.going.static.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -532,7 +572,7 @@ function clear_all_stats()
     local function update_dynmc(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.dynmc[key] = value; actions.updateStateValue("dynmc_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.dynmc[key] = value; stats.updateStateStatsValue("dynmc_" .. key, value) end
         local key_order = stats.going.dynmc.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -553,7 +593,7 @@ function clear_all_stats()
     local function update_fwd(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.fwd[key] = value; actions.updateStateValue("fwd_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.fwd[key] = value; stats.updateStateStatsValue("fwd_" .. key, value) end
         local key_order = stats.going.fwd.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -588,7 +628,7 @@ function clear_all_stats()
     local function update_up(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.up[key] = value; actions.updateStateValue("up_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.up[key] = value; stats.updateStateStatsValue("up_" .. key, value) end
         local key_order = stats.going.up.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -623,7 +663,7 @@ function clear_all_stats()
     local function update_dwn(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.dwn[key] = value; actions.updateStateValue("dwn_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.dwn[key] = value; stats.updateStateStatsValue("dwn_" .. key, value) end
         local key_order = stats.going.dwn.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -658,7 +698,7 @@ function clear_all_stats()
     local function update_lft(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.lft[key] = value; actions.updateStateValue("lft_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.lft[key] = value; stats.updateStateStatsValue("lft_" .. key, value) end
         local key_order = stats.going.lft.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -693,7 +733,7 @@ function clear_all_stats()
     local function update_rit(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.rit[key] = value; actions.updateStateValue("rit_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.rit[key] = value; stats.updateStateStatsValue("rit_" .. key, value) end
         local key_order = stats.going.rit.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -728,7 +768,7 @@ function clear_all_stats()
     local function update_bck(skp_lst)
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-        local function setAndUpdate(key, value) stats.going.bck[key] = value; actions.updateStateValue("bck_" .. key, value) end
+        local function setAndUpdate(key, value) stats.going.bck[key] = value; stats.updateStateStatsValue("bck_" .. key, value) end
         local key_order = stats.going.bck.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
@@ -814,17 +854,17 @@ end
 --| If I fill out these variables like a check list I can do fun things later maybe
 function first_min_max_xyz()
     stats.going.stats.vars.larg_x = status.pcTable[status.me].location.x
-    actions.updateStateValue("stats_vars_larg_x",status.pcTable[status.me].location.x)
+    stats.updateStateStatsValue("stats_vars_larg_x",status.pcTable[status.me].location.x)
     stats.going.stats.vars.larg_y = status.pcTable[status.me].location.y
-    actions.updateStateValue("stats_vars_larg_y",status.pcTable[status.me].location.y)
+    stats.updateStateStatsValue("stats_vars_larg_y",status.pcTable[status.me].location.y)
     stats.going.stats.vars.larg_z = status.pcTable[status.me].location.z
-    actions.updateStateValue("stats_vars_larg_z",status.pcTable[status.me].location.z)
+    stats.updateStateStatsValue("stats_vars_larg_z",status.pcTable[status.me].location.z)
     stats.going.stats.vars.smal_x = status.pcTable[status.me].location.x
-    actions.updateStateValue("stats_vars_smal_x",status.pcTable[status.me].location.x)
+    stats.updateStateStatsValue("stats_vars_smal_x",status.pcTable[status.me].location.x)
     stats.going.stats.vars.smal_y = status.pcTable[status.me].location.y
-    actions.updateStateValue("stats_vars_smal_y",status.pcTable[status.me].location.y)
+    stats.updateStateStatsValue("stats_vars_smal_y",status.pcTable[status.me].location.y)
     stats.going.stats.vars.smal_z = status.pcTable[status.me].location.z
-    actions.updateStateValue("stats_vars_smal_z",status.pcTable[status.me].location.z)
+    stats.updateStateStatsValue("stats_vars_smal_z",status.pcTable[status.me].location.z)
 end
 --| use the point a to point b system for the location information
 --| this is to calculate which cardinal direction turtle must go to get to point B from point A
@@ -841,7 +881,7 @@ function update_move(print, skp_lst)
     -- stats.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17})
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.stats.move[key] = value actions.updateStateValue("stats_move_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.stats.move[key] = value stats.updateStateStatsValue("stats_move_" .. key, value) end
     local key_order = stats.going.stats.move.key_order
     local updates = {
         function() setAndUpdate(key_order[1], stats.going.stats.move.total + 1) end,        --+ 1|total
@@ -869,7 +909,7 @@ function update_detect(print, skp_lst)
     -- stats.update_detect(false,{1,2,3,4})
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.stats.detect[key] = value; actions.updateStateValue("stats_detect_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.stats.detect[key] = value; stats.updateStateStatsValue("stats_detect_" .. key, value) end
     local key_order = stats.going.stats.detect.key_order
     local updates = {
         function() setAndUpdate(key_order[1], stats.going.stats.detect.total + 1) end,      --+ 1|total
@@ -884,7 +924,7 @@ function update_vars(print, skp_lst)
     -- stats.update_vars(false,{1,2,3,4,5,6,7,8,9,10,11,12})
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.stats.vars[key] = value; actions.updateStateValue("stats_vars_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.stats.vars[key] = value; stats.updateStateStatsValue("stats_vars_" .. key, value) end
     local key_order = stats.going.stats.vars.key_order
     local updates = {
         function() setAndUpdate(key_order[1], stats.going.stats.vars.tru + 1) end,          --* 1|tru
@@ -930,7 +970,7 @@ end
 function update_static(end_loc, path, print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.static[key] = value actions.updateStateValue("static_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.static[key] = value stats.updateStateStatsValue("static_" .. key, value) end
     local key_order = stats.going.static.key_order
     local updates = {
         --- sloc
@@ -958,7 +998,7 @@ end
 function update_dynmc(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.dynmc[key] = value; actions.updateStateValue("dynmc_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.dynmc[key] = value; stats.updateStateStatsValue("dynmc_" .. key, value) end
     local key_order = stats.going.dynmc.key_order
     local updates = {
         --- slocn
@@ -992,7 +1032,7 @@ end
 function update_fwd(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.fwd[key] = value; actions.updateStateValue("fwd_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.fwd[key] = value; stats.updateStateStatsValue("fwd_" .. key, value) end
     local key_order = stats.going.fwd.key_order
     local updates = {
         --- dirfc
@@ -1054,7 +1094,7 @@ end
 function update_up(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.up[key] = value; actions.updateStateValue("up_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.up[key] = value; stats.updateStateStatsValue("up_" .. key, value) end
     local key_order = stats.going.up.key_order
     local updates = {
         --- dirfc
@@ -1116,7 +1156,7 @@ end
 function update_dwn(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.dwn[key] = value; actions.updateStateValue("dwn_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.dwn[key] = value; stats.updateStateStatsValue("dwn_" .. key, value) end
     local key_order = stats.going.dwn.key_order
     local updates = {
         --- dirfc
@@ -1178,7 +1218,7 @@ end
 function update_lft(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.lft[key] = value; actions.updateStateValue("lft_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.lft[key] = value; stats.updateStateStatsValue("lft_" .. key, value) end
     local key_order = stats.going.lft.key_order
     local updates = {
         --- dirfc
@@ -1240,7 +1280,7 @@ end
 function update_rit(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.rit[key] = value; actions.updateStateValue("rit_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.rit[key] = value; stats.updateStateStatsValue("rit_" .. key, value) end
     local key_order = stats.going.rit.key_order
     local updates = {
         --- dirfc
@@ -1302,7 +1342,7 @@ end
 function update_bck(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
-    local function setAndUpdate(key, value) stats.going.bck[key] = value; actions.updateStateValue("bck_" .. key, value) end
+    local function setAndUpdate(key, value) stats.going.bck[key] = value; stats.updateStateStatsValue("bck_" .. key, value) end
     local key_order = stats.going.bck.key_order
     local updates = {
         --- dirfc
