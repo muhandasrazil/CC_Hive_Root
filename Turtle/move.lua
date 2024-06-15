@@ -621,6 +621,7 @@ function update_bck(print, skp_lst)
 end
 function go_to(end_location, end_orientation, path)
     actions.clear_all_stats()
+    sleep(2)
     status.going.endloc = end_location
     move.update_static(end_location, end_orientation, path, false, {})
     local function reached_destination()
