@@ -69,7 +69,11 @@ function updateStateValue(stateKey, newValue)
     if type(newValue) == "string" then
         newValueString = "'" .. newValue .. "'"
     elseif type(newValue) == "table" then
-        newValueString = "{" .. "x = " .. tostring(newValue.x) .. ", y = " .. tostring(newValue.y) .. ", z = " .. tostring(newValue.z) .. "}"
+        if (type(newValue.x) == "string" or type(newValue.y) == "string" or type(newValue.z) == "string") then
+            newValueString = "{".."x = ".."'"..tostring(newValue.x).."'"..", y = ".."'"..tostring(newValue.y).."'"..", z = ".."'"..tostring(newValue.z).."'".."}"
+        else
+            newValueString = "{".."x = "..tostring(newValue.x)..", y = "..tostring(newValue.y)..", z = "..tostring(newValue.z).."}"
+        end
     else
         newValueString = tostring(newValue)
     end

@@ -89,6 +89,35 @@ function print_going_status(t)
         print()
     end
 end
+-- use the point a to point b system for the location information
+-- this is to calculate which cardinal direction turtle must go to get to point B from point A
+function d_math(pointA_xyz,pointB_xyz)
+    local nx
+    local ny
+    local nz
+    if pointA_xyz.x > pointB_xyz.x then
+        nx = 'west'
+    elseif pointA_xyz.x < pointB_xyz.x then
+        nx = 'east'
+    else
+        nx = 'axis'
+    end
+    if pointA_xyz.y > pointB_xyz.y then
+        ny = 'down'
+    elseif pointA_xyz.y < pointB_xyz.y then
+        ny = 'up'
+    else
+        ny = 'axis'
+    end
+    if pointA_xyz.z > pointB_xyz.z then
+        nz = 'north'
+    elseif pointA_xyz.z < pointB_xyz.z then
+        nz = 'south'
+    else
+        nz = 'axis'
+    end
+    return {x = nx, y = ny, z = nz}
+end
 function update_move(print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
@@ -185,7 +214,7 @@ function update_vars(print, skp_lst)
     for i, func in ipairs(updates) do if not skp[i] then func() end end
     if print then move.print_going_status('stats.vars') end
 end
-function update_static(end_loc, end_ori, path, print, skp_lst)
+function update_static(end_loc, path, print, skp_lst)
     local skp = {}
     if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
     local function setAndUpdate(key, value) status.going.static[key] = value actions.updateStateValue("static_" .. key, value) end
@@ -206,9 +235,9 @@ function update_static(end_loc, end_ori, path, print, skp_lst)
         --- nav_priority_input
         function() setAndUpdate(key_order[7], path) end,
         --- sdir
-        function() setAndUpdate(key_order[8], status.pcTable[status.me].orientation) end,
+        function() setAndUpdate(key_order[8], move.d_math(status.pcTable[status.me].location,end_loc)) end,
         --- edir
-        function() setAndUpdate(key_order[9], end_ori) end,
+        function() setAndUpdate(key_order[9], move.d_math(end_loc,status.pcTable[status.me].location)) end,
     }
     for i, func in ipairs(updates) do if not skp[i] then func() end end
     if print then move.print_going_status('static') end
@@ -623,7 +652,8 @@ function go_to(end_location, end_orientation, path)
     actions.clear_all_stats()
     sleep(2)
     status.going.endloc = end_location
-    move.update_static(end_location, end_orientation, path, false, {})
+    move.update_static(end_location, path, false, {})
+    read()
     local function reached_destination()
         for axis in path:gmatch('.') do
             if status.pcTable[status.me].location[axis] ~= end_location[axis] then
