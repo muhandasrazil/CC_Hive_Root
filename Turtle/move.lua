@@ -51,18 +51,26 @@ function log_movement(direction)
     end
     return true
 end
-
 function print_going_status(t)
     term.clear()
     term.setCursorPos(1,1)
     print(t..":")
-    for _, key in ipairs(status.going[t].key_order) do
-        val = status.going[t][key]
+    local function resolveTablePath(tbl, path)
+        local scope = tbl
+        for part in string.gmatch(path, "[^.]+") do
+            scope = scope[part]
+            if not scope then return nil end
+        end
+        return scope
+    end
+    local resolvedTable = resolveTablePath(status.going, t)
+    for _, key in ipairs(resolvedTable.key_order) do
+        local val = resolvedTable[key]
         term.write(key..":  ")
         if type(val) == "table" then
             if val.key_order then
                 for _, k in ipairs(val.key_order) do
-                    v = val[k]
+                    local v = val[k]
                     print(k..":  ")
                     if type(v) == "table" then
                         for _, subkey in ipairs(status.going.sub_order) do
@@ -76,298 +84,545 @@ function print_going_status(t)
                 end
             end
         else
-            term.write(val)
+            term.write(tostring(val))
         end
         print()
     end
 end
-function update_stats(move, mp, detect, dp, vars, vp, print)
-    if move then
-        move.update_move(mp)
-    end
-    if detect then
-        move.update_detect(dp)
-    end
-    if vars then
-        move.update_vars(vp)
-    end
-    if print then
-        move.print_going_status('stats')
-    end
+function update_move(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.stats.move[key] = value actions.updateStateValue("stats_move_" .. key, value) end
+    local key_order = status.going.stats.move.key_order
+    local updates = {
+        --- total
+        function() setAndUpdate(key_order[1], nil) end,
+        --- pos_x
+        function() setAndUpdate(key_order[2], nil) end,
+        --- pos_y
+        function() setAndUpdate(key_order[3], nil) end,
+        --- pos_z
+        function() setAndUpdate(key_order[4], nil) end,
+        --- neg_x
+        function() setAndUpdate(key_order[5], nil) end,
+        --- neg_y
+        function() setAndUpdate(key_order[6], nil) end,
+        --- neg_z
+        function() setAndUpdate(key_order[7], nil) end,
+        --- north
+        function() setAndUpdate(key_order[8], nil) end,
+        --- south
+        function() setAndUpdate(key_order[9], nil) end,
+        --- east
+        function() setAndUpdate(key_order[10], nil) end,
+        --- west
+        function() setAndUpdate(key_order[11], nil) end,
+        --- up
+        function() setAndUpdate(key_order[12], nil) end,
+        --- down
+        function() setAndUpdate(key_order[13], nil) end,
+        --- left
+        function() setAndUpdate(key_order[14], nil) end,
+        --- right
+        function() setAndUpdate(key_order[15], nil) end,
+        --- forward
+        function() setAndUpdate(key_order[16], nil) end,
+        --- back
+        function() setAndUpdate(key_order[17], nil) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('stats') end
 end
-function update_move(print)
-    status.going.stats.move.total = nil
-    status.going.stats.move.pos_x = nil
-    status.going.stats.move.pos_y = nil
-    status.going.stats.move.pos_z = nil
-    status.going.stats.move.neg_x = nil
-    status.going.stats.move.neg_y = nil
-    status.going.stats.move.neg_z = nil
-    status.going.stats.move.north = nil
-    status.going.stats.move.south = nil
-    status.going.stats.move.east = nil
-    status.going.stats.move.west = nil
-    status.going.stats.move.up = nil
-    status.going.stats.move.down = nil
-    status.going.stats.move.left = nil
-    status.going.stats.move.right = nil
-    status.going.stats.move.forward = nil
-    status.going.stats.move.back = nil
-    if print then
-        move.print_going_status('stats.move')
-    end
+function update_detect(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.stats.detect[key] = value; actions.updateStateValue("stats_detect_" .. key, value) end
+    local key_order = status.going.stats.detect.key_order
+    local updates = {
+        --- total
+        function() setAndUpdate(key_order[1], nil) end,
+        --- up
+        function() setAndUpdate(key_order[2], nil) end,
+        --- down
+        function() setAndUpdate(key_order[3], nil) end,
+        --- forward
+        function() setAndUpdate(key_order[4], nil) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('stats.detect') end
 end
-function update_detect(print)
-    status.going.stats.detect.total = nil
-    status.going.stats.detect.up = nil
-    status.going.stats.detect.down = nil
-    status.going.stats.detect.forward = nil
-    if print then
-        move.print_going_status('stats.detect')
-    end
+function update_vars(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.stats.vars[key] = value; actions.updateStateValue("stats_vars_" .. key, value) end
+    local key_order = status.going.stats.vars.key_order
+    local updates = {
+        --- tru
+        function() setAndUpdate(key_order[1], nil) end,
+        --- fls
+        function() setAndUpdate(key_order[2], nil) end,
+        --- go
+        function() setAndUpdate(key_order[3], nil) end,
+        --- up
+        function() setAndUpdate(key_order[4], nil) end,
+        --- down
+        function() setAndUpdate(key_order[5], nil) end,
+        --- forward
+        function() setAndUpdate(key_order[6], nil) end,
+        --- larg_x
+        function() setAndUpdate(key_order[7], nil) end,
+        --- larg_y
+        function() setAndUpdate(key_order[8], nil) end,
+        --- larg_z
+        function() setAndUpdate(key_order[9], nil) end,
+        --- smal_x
+        function() setAndUpdate(key_order[10], nil) end,
+        --- smal_y
+        function() setAndUpdate(key_order[11], nil) end,
+        --- smal_z
+        function() setAndUpdate(key_order[12], nil) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('stats.vars') end
 end
-function update_vars(print)
-    status.going.stats.vars.tru = nil
-    status.going.stats.vars.fls = nil
-    status.going.stats.vars.go = nil
-    status.going.stats.vars.up = nil
-    status.going.stats.vars.down = nil
-    status.going.stats.vars.forward = nil
-    status.going.stats.vars.larg_x = nil
-    status.going.stats.vars.larg_y = nil
-    status.going.stats.vars.larg_z = nil
-    status.going.stats.vars.smal_x = nil
-    status.going.stats.vars.smal_y = nil
-    status.going.stats.vars.smal_z = nil
-    if print then
-        move.print_going_status('stats.vars')
-    end
+function update_static(end_loc, end_ori, path, print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.static[key] = value actions.updateStateValue("static_" .. key, value) end
+    local key_order = status.going.static.key_order
+    local updates = {
+        --- sloc
+        function() setAndUpdate(key_order[1], status.pcTable[status.me].location) end,
+        --- eloc
+        function() setAndUpdate(key_order[2], end_loc) end,
+        --- sloc_nav
+        function() setAndUpdate(key_order[3], {x = status.pcTable[status.me].location.x - end_loc.x, y = status.pcTable[status.me].location.y - end_loc.y, z = status.pcTable[status.me].location.z - end_loc.z}) end,
+        --- sloc_nav_abs
+        function() setAndUpdate(key_order[4], {x = math.abs(status.pcTable[status.me].location.x - end_loc.x), y = math.abs(status.pcTable[status.me].location.y - end_loc.y), z = math.abs(status.pcTable[status.me].location.z - end_loc.z)}) end,
+        --- eloc_nav
+        function() setAndUpdate(key_order[5], {x = end_loc.x - status.pcTable[status.me].location.x, y = end_loc.y - status.pcTable[status.me].location.y, z = end_loc.z - status.pcTable[status.me].location.z}) end,
+        --- eloc_nav_abs
+        function() setAndUpdate(key_order[6], {x = math.abs(end_loc.x - status.pcTable[status.me].location.x), y = math.abs(end_loc.y - status.pcTable[status.me].location.y), z = math.abs(end_loc.z - status.pcTable[status.me].location.z)}) end,
+        --- nav_priority_input
+        function() setAndUpdate(key_order[7], path) end,
+        --- sdir
+        function() setAndUpdate(key_order[8], status.pcTable[status.me].orientation) end,
+        --- edir
+        function() setAndUpdate(key_order[9], end_ori) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('static') end
 end
-
-
-
---{x = , y = , z = }
-function update_static(end_loc, end_ori, path,print)
-    status.going.static.sloc = status.pcTable[status.me].location
-    status.going.static.eloc = end_loc
-    status.going.static.sloc_nav = {x = status.pcTable[status.me].location.x-end_loc.x, y = status.pcTable[status.me].location.y-end_loc.y, z =status.pcTable[status.me].location.z-end_loc.z}
-    status.going.static.sloc_nav_abs = {x = math.abs(status.pcTable[status.me].location.x-end_loc.x), y = math.abs(status.pcTable[status.me].location.y-end_loc.y), z = math.abs(status.pcTable[status.me].location.z-end_loc.z)}
-    status.going.static.eloc_nav = {x = end_loc.x-status.pcTable[status.me].location.x, y = end_loc.y-status.pcTable[status.me].location.y, z = end_loc.z-status.pcTable[status.me].location.z}
-    status.going.static.eloc_nav_abs = {x = math.abs(end_loc.x-status.pcTable[status.me].location.x),y = math.abs(end_loc.y-status.pcTable[status.me].location.y), z = math.abs(end_loc.z-status.pcTable[status.me].location.z)}
-    status.going.static.nav_priority_input = path
-    status.going.static.sdir = status.pcTable[status.me].orientation
-    status.going.static.edir = end_ori
-    if print then
-        move.print_going_status('static')
-    end
+function update_dynmc(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.dynmc[key] = value; actions.updateStateValue("dynmc_" .. key, value) end
+    local key_order = status.going.dynmc.key_order
+    local updates = {
+        --- slocn
+        function() setAndUpdate(key_order[1], status.pcTable[status.me].location) end,
+        --- slocn_nav
+        function() setAndUpdate(key_order[2], {x = nil, y = nil, z = nil}) end,
+        --- slocn_nav_abs
+        function() setAndUpdate(key_order[3], {x = nil, y = nil, z = nil}) end,
+        --- elocn
+        function() setAndUpdate(key_order[4], nil) end,
+        --- elocn_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- elocn_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- dirn
+        function() setAndUpdate(key_order[9], nil) end,
+        --- sdirn
+        function() setAndUpdate(key_order[10], nil) end,
+        --- edirn
+        function() setAndUpdate(key_order[11], nil) end,
+        --- axisn
+        function() setAndUpdate(key_order[12], nil) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('dynmc') end
 end
-function update_dynmc(print)
-    status.going.dynmc.slocn = nil
-    status.going.dynmc.elocn = nil
-    status.going.dynmc.slocn_nav = {x = nil, y = nil, z = nil}
-    status.going.dynmc.slocn_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.dynmc.elocn_nav = {x = nil, y = nil, z = nil}
-    status.going.dynmc.elocn_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.dynmc.nav = {x = nil, y = nil, z = nil}
-    status.going.dynmc.nav_abs = {x = nil, y = nil, z = nil}
-    status.going.dynmc.dirn = nil
-    status.going.dynmc.sdirn = nil
-    status.going.dynmc.edirn = nil
-    status.going.dynmc.axisn = nil
-    if print then
-        move.print_going_status('dynmc')
-    end
+function update_fwd(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.fwd[key] = value; actions.updateStateValue("fwd_" .. key, value) end
+    local key_order = status.going.fwd.key_order
+    local updates = {
+        --- dirfc
+        function() setAndUpdate(key_order[1], nil) end,
+        --- sdir
+        function() setAndUpdate(key_order[2], nil) end,
+        --- edir
+        function() setAndUpdate(key_order[3], nil) end,
+        --- hloc
+        function() setAndUpdate(key_order[4], nil) end,
+        --- hs_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- hs_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- he_nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- he_nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh
+        function() setAndUpdate(key_order[9], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh_abs
+        function() setAndUpdate(key_order[10], {x = nil, y = nil, z = nil}) end,
+        --- nav_he
+        function() setAndUpdate(key_order[11], {x = nil, y = nil, z = nil}) end,
+        --- nav_he_abs
+        function() setAndUpdate(key_order[12], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c
+        function() setAndUpdate(key_order[13], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c_abs
+        function() setAndUpdate(key_order[14], {x = nil, y = nil, z = nil}) end,
+        --- clos_sloc
+        function() setAndUpdate(key_order[15], nil) end,
+        --- clos_nav_s
+        function() setAndUpdate(key_order[16], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_s_abs
+        function() setAndUpdate(key_order[17], {x = nil, y = nil, z = nil}) end,
+        --- clo_eloc
+        function() setAndUpdate(key_order[18], nil) end,
+        --- clo_nav_e
+        function() setAndUpdate(key_order[19], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_e_abs
+        function() setAndUpdate(key_order[20], {x = nil, y = nil, z = nil}) end,
+        --- fur_sloc
+        function() setAndUpdate(key_order[21], nil) end,
+        --- fur_nav_s
+        function() setAndUpdate(key_order[22], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_s_abs
+        function() setAndUpdate(key_order[23], {x = nil, y = nil, z = nil}) end,
+        --- fur_eloc
+        function() setAndUpdate(key_order[24], nil) end,
+        --- fur_nav_e
+        function() setAndUpdate(key_order[25], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_e_abs
+        function() setAndUpdate(key_order[26], {x = nil, y = nil, z = nil}) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('fwd') end
 end
-function update_fwd(print)
-    status.going.fwd.dirfc = nil
-    status.going.fwd.sdir = nil
-    status.going.fwd.edir = nil
-    status.going.fwd.hloc = nil
-    status.going.fwd.hs_nav = {x = nil, y = nil, z = nil}
-    status.going.fwd.hs_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.he_nav = {x = nil, y = nil, z = nil}
-    status.going.fwd.he_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.nav_sh = {x = nil, y = nil, z = nil}
-    status.going.fwd.nav_sh_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.nav_he = {x = nil, y = nil, z = nil}
-    status.going.fwd.nav_he_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.h_nav_c = {x = nil, y = nil, z = nil}
-    status.going.fwd.h_nav_c_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.clos_sloc = nil
-    status.going.fwd.clos_nav_s = {x = nil, y = nil, z = nil}
-    status.going.fwd.clo_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.clo_eloc = nil
-    status.going.fwd.clo_nav_e = {x = nil, y = nil, z = nil}
-    status.going.fwd.clo_nav_e_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.fur_sloc = nil
-    status.going.fwd.fur_nav_s = {x = nil, y = nil, z = nil}
-    status.going.fwd.fur_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.fwd.fur_eloc = nil
-    status.going.fwd.fur_nav_e = {x = nil, y = nil, z = nil}
-    status.going.fwd.fur_nav_e_abs = {x = nil, y = nil, z = nil}
-    if print then
-        move.print_going_status('fwd')
-    end
+function update_up(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.up[key] = value; actions.updateStateValue("up_" .. key, value) end
+    local key_order = status.going.up.key_order
+    local updates = {
+        --- dirfc
+        function() setAndUpdate(key_order[1], nil) end,
+        --- sdir
+        function() setAndUpdate(key_order[2], nil) end,
+        --- edir
+        function() setAndUpdate(key_order[3], nil) end,
+        --- hloc
+        function() setAndUpdate(key_order[4], nil) end,
+        --- hs_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- hs_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- he_nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- he_nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh
+        function() setAndUpdate(key_order[9], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh_abs
+        function() setAndUpdate(key_order[10], {x = nil, y = nil, z = nil}) end,
+        --- nav_he
+        function() setAndUpdate(key_order[11], {x = nil, y = nil, z = nil}) end,
+        --- nav_he_abs
+        function() setAndUpdate(key_order[12], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c
+        function() setAndUpdate(key_order[13], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c_abs
+        function() setAndUpdate(key_order[14], {x = nil, y = nil, z = nil}) end,
+        --- clos_sloc
+        function() setAndUpdate(key_order[15], nil) end,
+        --- clos_nav_s
+        function() setAndUpdate(key_order[16], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_s_abs
+        function() setAndUpdate(key_order[17], {x = nil, y = nil, z = nil}) end,
+        --- clo_eloc
+        function() setAndUpdate(key_order[18], nil) end,
+        --- clo_nav_e
+        function() setAndUpdate(key_order[19], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_e_abs
+        function() setAndUpdate(key_order[20], {x = nil, y = nil, z = nil}) end,
+        --- fur_sloc
+        function() setAndUpdate(key_order[21], nil) end,
+        --- fur_nav_s
+        function() setAndUpdate(key_order[22], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_s_abs
+        function() setAndUpdate(key_order[23], {x = nil, y = nil, z = nil}) end,
+        --- fur_eloc
+        function() setAndUpdate(key_order[24], nil) end,
+        --- fur_nav_e
+        function() setAndUpdate(key_order[25], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_e_abs
+        function() setAndUpdate(key_order[26], {x = nil, y = nil, z = nil}) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('up') end
 end
-function update_up(print)
-    status.going.up.dirfc = nil
-    status.going.up.sdir = nil
-    status.going.up.edir = nil
-    status.going.up.hloc = nil
-    status.going.up.hs_nav = {x = nil, y = nil, z = nil}
-    status.going.up.hs_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.up.he_nav = {x = nil, y = nil, z = nil}
-    status.going.up.he_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.up.nav_sh = {x = nil, y = nil, z = nil}
-    status.going.up.nav_sh_abs = {x = nil, y = nil, z = nil}
-    status.going.up.nav_he = {x = nil, y = nil, z = nil}
-    status.going.up.nav_he_abs = {x = nil, y = nil, z = nil}
-    status.going.up.h_nav_c = {x = nil, y = nil, z = nil}
-    status.going.up.h_nav_c_abs = {x = nil, y = nil, z = nil}
-    status.going.up.clos_sloc = nil
-    status.going.up.clos_nav_s = {x = nil, y = nil, z = nil}
-    status.going.up.clo_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.up.clo_eloc = nil
-    status.going.up.clo_nav_e = {x = nil, y = nil, z = nil}
-    status.going.up.clo_nav_e_abs = {x = nil, y = nil, z = nil}
-    status.going.up.fur_sloc = nil
-    status.going.up.fur_nav_s = {x = nil, y = nil, z = nil}
-    status.going.up.fur_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.up.fur_eloc = nil
-    status.going.up.fur_nav_e = {x = nil, y = nil, z = nil}
-    status.going.up.fur_nav_e_abs = {x = nil, y = nil, z = nil}
-    if print then
-        move.print_going_status('up')
-    end
+function update_dwn(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.dwn[key] = value; actions.updateStateValue("dwn_" .. key, value) end
+    local key_order = status.going.dwn.key_order
+    local updates = {
+        --- dirfc
+        function() setAndUpdate(key_order[1], nil) end,
+        --- sdir
+        function() setAndUpdate(key_order[2], nil) end,
+        --- edir
+        function() setAndUpdate(key_order[3], nil) end,
+        --- hloc
+        function() setAndUpdate(key_order[4], nil) end,
+        --- hs_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- hs_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- he_nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- he_nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh
+        function() setAndUpdate(key_order[9], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh_abs
+        function() setAndUpdate(key_order[10], {x = nil, y = nil, z = nil}) end,
+        --- nav_he
+        function() setAndUpdate(key_order[11], {x = nil, y = nil, z = nil}) end,
+        --- nav_he_abs
+        function() setAndUpdate(key_order[12], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c
+        function() setAndUpdate(key_order[13], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c_abs
+        function() setAndUpdate(key_order[14], {x = nil, y = nil, z = nil}) end,
+        --- clos_sloc
+        function() setAndUpdate(key_order[15], nil) end,
+        --- clos_nav_s
+        function() setAndUpdate(key_order[16], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_s_abs
+        function() setAndUpdate(key_order[17], {x = nil, y = nil, z = nil}) end,
+        --- clo_eloc
+        function() setAndUpdate(key_order[18], nil) end,
+        --- clo_nav_e
+        function() setAndUpdate(key_order[19], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_e_abs
+        function() setAndUpdate(key_order[20], {x = nil, y = nil, z = nil}) end,
+        --- fur_sloc
+        function() setAndUpdate(key_order[21], nil) end,
+        --- fur_nav_s
+        function() setAndUpdate(key_order[22], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_s_abs
+        function() setAndUpdate(key_order[23], {x = nil, y = nil, z = nil}) end,
+        --- fur_eloc
+        function() setAndUpdate(key_order[24], nil) end,
+        --- fur_nav_e
+        function() setAndUpdate(key_order[25], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_e_abs
+        function() setAndUpdate(key_order[26], {x = nil, y = nil, z = nil}) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('dwn') end
 end
-function update_dwn(print)
-    status.going.dwn.dirfc = nil
-    status.going.dwn.sdir = nil
-    status.going.dwn.edir = nil
-    status.going.dwn.hloc = nil
-    status.going.dwn.hs_nav = {x = nil, y = nil, z = nil}
-    status.going.dwn.hs_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.he_nav = {x = nil, y = nil, z = nil}
-    status.going.dwn.he_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.nav_sh = {x = nil, y = nil, z = nil}
-    status.going.dwn.nav_sh_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.nav_he = {x = nil, y = nil, z = nil}
-    status.going.dwn.nav_he_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.h_nav_c = {x = nil, y = nil, z = nil}
-    status.going.dwn.h_nav_c_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.clos_sloc = nil
-    status.going.dwn.clos_nav_s = {x = nil, y = nil, z = nil}
-    status.going.dwn.clo_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.clo_eloc = nil
-    status.going.dwn.clo_nav_e = {x = nil, y = nil, z = nil}
-    status.going.dwn.clo_nav_e_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.fur_sloc = nil
-    status.going.dwn.fur_nav_s = {x = nil, y = nil, z = nil}
-    status.going.dwn.fur_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.dwn.fur_eloc = nil
-    status.going.dwn.fur_nav_e = {x = nil, y = nil, z = nil}
-    status.going.dwn.fur_nav_e_abs = {x = nil, y = nil, z = nil}
-    if print then
-        move.print_going_status('dwn')
-    end
+function update_lft(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.lft[key] = value; actions.updateStateValue("lft_" .. key, value) end
+    local key_order = status.going.lft.key_order
+    local updates = {
+        --- dirfc
+        function() setAndUpdate(key_order[1], nil) end,
+        --- sdir
+        function() setAndUpdate(key_order[2], nil) end,
+        --- edir
+        function() setAndUpdate(key_order[3], nil) end,
+        --- hloc
+        function() setAndUpdate(key_order[4], nil) end,
+        --- hs_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- hs_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- he_nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- he_nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh
+        function() setAndUpdate(key_order[9], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh_abs
+        function() setAndUpdate(key_order[10], {x = nil, y = nil, z = nil}) end,
+        --- nav_he
+        function() setAndUpdate(key_order[11], {x = nil, y = nil, z = nil}) end,
+        --- nav_he_abs
+        function() setAndUpdate(key_order[12], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c
+        function() setAndUpdate(key_order[13], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c_abs
+        function() setAndUpdate(key_order[14], {x = nil, y = nil, z = nil}) end,
+        --- clos_sloc
+        function() setAndUpdate(key_order[15], nil) end,
+        --- clos_nav_s
+        function() setAndUpdate(key_order[16], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_s_abs
+        function() setAndUpdate(key_order[17], {x = nil, y = nil, z = nil}) end,
+        --- clo_eloc
+        function() setAndUpdate(key_order[18], nil) end,
+        --- clo_nav_e
+        function() setAndUpdate(key_order[19], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_e_abs
+        function() setAndUpdate(key_order[20], {x = nil, y = nil, z = nil}) end,
+        --- fur_sloc
+        function() setAndUpdate(key_order[21], nil) end,
+        --- fur_nav_s
+        function() setAndUpdate(key_order[22], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_s_abs
+        function() setAndUpdate(key_order[23], {x = nil, y = nil, z = nil}) end,
+        --- fur_eloc
+        function() setAndUpdate(key_order[24], nil) end,
+        --- fur_nav_e
+        function() setAndUpdate(key_order[25], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_e_abs
+        function() setAndUpdate(key_order[26], {x = nil, y = nil, z = nil}) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('lft') end
 end
-function update_lft(print)
-    status.going.lft.dirfc = nil
-    status.going.lft.sdir = nil
-    status.going.lft.edir = nil
-    status.going.lft.hloc = nil
-    status.going.lft.hs_nav = {x = nil, y = nil, z = nil}
-    status.going.lft.hs_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.he_nav = {x = nil, y = nil, z = nil}
-    status.going.lft.he_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.nav_sh = {x = nil, y = nil, z = nil}
-    status.going.lft.nav_sh_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.nav_he = {x = nil, y = nil, z = nil}
-    status.going.lft.nav_he_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.h_nav_c = {x = nil, y = nil, z = nil}
-    status.going.lft.h_nav_c_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.clos_sloc = nil
-    status.going.lft.clos_nav_s = {x = nil, y = nil, z = nil}
-    status.going.lft.clo_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.clo_eloc = nil
-    status.going.lft.clo_nav_e = {x = nil, y = nil, z = nil}
-    status.going.lft.clo_nav_e_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.fur_sloc = nil
-    status.going.lft.fur_nav_s = {x = nil, y = nil, z = nil}
-    status.going.lft.fur_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.lft.fur_eloc = nil
-    status.going.lft.fur_nav_e = {x = nil, y = nil, z = nil}
-    status.going.lft.fur_nav_e_abs = {x = nil, y = nil, z = nil}
-    if print then
-        move.print_going_status('lft')
-    end
+function update_rit(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.rit[key] = value; actions.updateStateValue("rit_" .. key, value) end
+    local key_order = status.going.rit.key_order
+    local updates = {
+        --- dirfc
+        function() setAndUpdate(key_order[1], nil) end,
+        --- sdir
+        function() setAndUpdate(key_order[2], nil) end,
+        --- edir
+        function() setAndUpdate(key_order[3], nil) end,
+        --- hloc
+        function() setAndUpdate(key_order[4], nil) end,
+        --- hs_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- hs_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- he_nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- he_nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh
+        function() setAndUpdate(key_order[9], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh_abs
+        function() setAndUpdate(key_order[10], {x = nil, y = nil, z = nil}) end,
+        --- nav_he
+        function() setAndUpdate(key_order[11], {x = nil, y = nil, z = nil}) end,
+        --- nav_he_abs
+        function() setAndUpdate(key_order[12], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c
+        function() setAndUpdate(key_order[13], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c_abs
+        function() setAndUpdate(key_order[14], {x = nil, y = nil, z = nil}) end,
+        --- clos_sloc
+        function() setAndUpdate(key_order[15], nil) end,
+        --- clos_nav_s
+        function() setAndUpdate(key_order[16], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_s_abs
+        function() setAndUpdate(key_order[17], {x = nil, y = nil, z = nil}) end,
+        --- clo_eloc
+        function() setAndUpdate(key_order[18], nil) end,
+        --- clo_nav_e
+        function() setAndUpdate(key_order[19], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_e_abs
+        function() setAndUpdate(key_order[20], {x = nil, y = nil, z = nil}) end,
+        --- fur_sloc
+        function() setAndUpdate(key_order[21], nil) end,
+        --- fur_nav_s
+        function() setAndUpdate(key_order[22], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_s_abs
+        function() setAndUpdate(key_order[23], {x = nil, y = nil, z = nil}) end,
+        --- fur_eloc
+        function() setAndUpdate(key_order[24], nil) end,
+        --- fur_nav_e
+        function() setAndUpdate(key_order[25], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_e_abs
+        function() setAndUpdate(key_order[26], {x = nil, y = nil, z = nil}) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('rit') end
 end
-function update_rit(print)
-    status.going.rit.dirfc = nil
-    status.going.rit.sdir = nil
-    status.going.rit.edir = nil
-    status.going.rit.hloc = nil
-    status.going.rit.hs_nav = {x = nil, y = nil, z = nil}
-    status.going.rit.hs_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.he_nav = {x = nil, y = nil, z = nil}
-    status.going.rit.he_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.nav_sh = {x = nil, y = nil, z = nil}
-    status.going.rit.nav_sh_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.nav_he = {x = nil, y = nil, z = nil}
-    status.going.rit.nav_he_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.h_nav_c = {x = nil, y = nil, z = nil}
-    status.going.rit.h_nav_c_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.clos_sloc = nil
-    status.going.rit.clos_nav_s = {x = nil, y = nil, z = nil}
-    status.going.rit.clo_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.clo_eloc = nil
-    status.going.rit.clo_nav_e = {x = nil, y = nil, z = nil}
-    status.going.rit.clo_nav_e_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.fur_sloc = nil
-    status.going.rit.fur_nav_s = {x = nil, y = nil, z = nil}
-    status.going.rit.fur_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.rit.fur_eloc = nil
-    status.going.rit.fur_nav_e = {x = nil, y = nil, z = nil}
-    status.going.rit.fur_nav_e_abs = {x = nil, y = nil, z = nil}
-    if print then
-        move.print_going_status('rit')
-    end
-end
-function update_bck(print)
-    status.going.bck.dirfc = nil
-    status.going.bck.sdir = nil
-    status.going.bck.edir = nil
-    status.going.bck.hloc = nil
-    status.going.bck.hs_nav = {x = nil, y = nil, z = nil}
-    status.going.bck.hs_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.he_nav = {x = nil, y = nil, z = nil}
-    status.going.bck.he_nav_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.nav_sh = {x = nil, y = nil, z = nil}
-    status.going.bck.nav_sh_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.nav_he = {x = nil, y = nil, z = nil}
-    status.going.bck.nav_he_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.h_nav_c = {x = nil, y = nil, z = nil}
-    status.going.bck.h_nav_c_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.clos_sloc = nil
-    status.going.bck.clos_nav_s = {x = nil, y = nil, z = nil}
-    status.going.bck.clo_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.clo_eloc = nil
-    status.going.bck.clo_nav_e = {x = nil, y = nil, z = nil}
-    status.going.bck.clo_nav_e_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.fur_sloc = nil
-    status.going.bck.fur_nav_s = {x = nil, y = nil, z = nil}
-    status.going.bck.fur_nav_s_abs = {x = nil, y = nil, z = nil}
-    status.going.bck.fur_eloc = nil
-    status.going.bck.fur_nav_e = {x = nil, y = nil, z = nil}
-    status.going.bck.fur_nav_e_abs = {x = nil, y = nil, z = nil}
-    if print then
-        move.print_going_status('bck')
-    end
+function update_bck(print, skp_lst)
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) status.going.bck[key] = value; actions.updateStateValue("bck_" .. key, value) end
+    local key_order = status.going.bck.key_order
+    local updates = {
+        --- dirfc
+        function() setAndUpdate(key_order[1], nil) end,
+        --- sdir
+        function() setAndUpdate(key_order[2], nil) end,
+        --- edir
+        function() setAndUpdate(key_order[3], nil) end,
+        --- hloc
+        function() setAndUpdate(key_order[4], nil) end,
+        --- hs_nav
+        function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
+        --- hs_nav_abs
+        function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
+        --- he_nav
+        function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
+        --- he_nav_abs
+        function() setAndUpdate(key_order[8], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh
+        function() setAndUpdate(key_order[9], {x = nil, y = nil, z = nil}) end,
+        --- nav_sh_abs
+        function() setAndUpdate(key_order[10], {x = nil, y = nil, z = nil}) end,
+        --- nav_he
+        function() setAndUpdate(key_order[11], {x = nil, y = nil, z = nil}) end,
+        --- nav_he_abs
+        function() setAndUpdate(key_order[12], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c
+        function() setAndUpdate(key_order[13], {x = nil, y = nil, z = nil}) end,
+        --- h_nav_c_abs
+        function() setAndUpdate(key_order[14], {x = nil, y = nil, z = nil}) end,
+        --- clos_sloc
+        function() setAndUpdate(key_order[15], nil) end,
+        --- clos_nav_s
+        function() setAndUpdate(key_order[16], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_s_abs
+        function() setAndUpdate(key_order[17], {x = nil, y = nil, z = nil}) end,
+        --- clo_eloc
+        function() setAndUpdate(key_order[18], nil) end,
+        --- clo_nav_e
+        function() setAndUpdate(key_order[19], {x = nil, y = nil, z = nil}) end,
+        --- clo_nav_e_abs
+        function() setAndUpdate(key_order[20], {x = nil, y = nil, z = nil}) end,
+        --- fur_sloc
+        function() setAndUpdate(key_order[21], nil) end,
+        --- fur_nav_s
+        function() setAndUpdate(key_order[22], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_s_abs
+        function() setAndUpdate(key_order[23], {x = nil, y = nil, z = nil}) end,
+        --- fur_eloc
+        function() setAndUpdate(key_order[24], nil) end,
+        --- fur_nav_e
+        function() setAndUpdate(key_order[25], {x = nil, y = nil, z = nil}) end,
+        --- fur_nav_e_abs
+        function() setAndUpdate(key_order[26], {x = nil, y = nil, z = nil}) end,
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then move.print_going_status('bck') end
 end
 function go_to(end_location, end_orientation, path)
+    actions.clear_all_stats()
     status.going.endloc = end_location
-    move.update_static(end_location, end_orientation, path,true)
-    read()
+    move.update_static(end_location, end_orientation, path, false, {})
     local function reached_destination()
         for axis in path:gmatch('.') do
             if status.pcTable[status.me].location[axis] ~= end_location[axis] then
