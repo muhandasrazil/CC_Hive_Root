@@ -21,9 +21,11 @@ fs.makeDir('/apis')
 fs.copy('/actions.lua', '/apis/actions')
 fs.copy('/status.lua', '/apis/status')
 fs.copy('/move.lua', '/apis/move')
+fs.copy('/stats.lua', '/apis/stats')
 os.loadAPI('/apis/actions')
 os.loadAPI('/apis/status')
 os.loadAPI('/apis/move')
+os.loadAPI('/apis/stats')
 for _, side in pairs({'back', 'top', 'left', 'right'}) do
     if peripheral.getType(side) == 'modem' then
         modem_side = side
