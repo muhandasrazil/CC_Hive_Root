@@ -36,50 +36,48 @@ end
 function log_movement(direction)
     if direction == 'up' then
         status.pcTable[status.me].location.y = status.pcTable[status.me].location.y +1
-        stats.update_move(false,{1,2,4,5,6,7,8,9,10,11,13,14,15,16,17})                     --+ 3|pos_y - 12|up
-        stats.update_vars(false,{1,2,3,5,6,7,8,9,10,11,12})                                 --* 4|up
+        stats.update_move(false,{1,2,4,5,6,7,8,9,10,11,13,14,15,16,17})                     --+ move - 3|pos_y - 12|up
     elseif direction == 'down' then
         status.pcTable[status.me].location.y = status.pcTable[status.me].location.y -1
-        stats.update_move(false,{1,2,3,4,5,7,8,9,10,11,12,14,15,16,17})                     --+ 6|neg_y - 13|down
-        stats.update_vars(false,{1,2,3,4,6,7,8,9,10,11,12})                                 --* 5|down
+        stats.update_move(false,{1,2,3,4,5,7,8,9,10,11,12,14,15,16,17})                     --* move - 6|neg_y - 13|down
     elseif direction == 'forward' then
         bump = status.bumps[status.pcTable[status.me].orientation]
         status.pcTable[status.me].location = {x = status.pcTable[status.me].location.x + bump[1], y = status.pcTable[status.me].location.y + bump[2], z = status.pcTable[status.me].location.z + bump[3]}
         if status.pcTable[status.me].orientation == 'north' then
-            stats.update_move(false,{1,2,3,4,5,6,9,10,11,12,13,14,15,17})                   --+ 7|neg_z - 8|north - 16|forward
+            stats.update_move(false,{1,2,3,4,5,6,9,10,11,12,13,14,15,17})                   --+ move - 7|neg_z - 8|north - 16|forward
         elseif status.pcTable[status.me].orientation == 'south' then
-            stats.update_move(false,{1,2,3,5,6,7,8,10,11,12,13,14,15,17})                   --+ 4|pos_z - 9|south - 16|forward
+            stats.update_move(false,{1,2,3,5,6,7,8,10,11,12,13,14,15,17})                   --+ move - 4|pos_z - 9|south - 16|forward
         elseif status.pcTable[status.me].orientation == 'east' then
-            stats.update_move(false,{1,3,4,5,6,7,8,9,11,12,13,14,15,17})                    --+ 2|pos_x - 10|east - 16|forward
+            stats.update_move(false,{1,3,4,5,6,7,8,9,11,12,13,14,15,17})                    --+ move - 2|pos_x - 10|east - 16|forward
         elseif status.pcTable[status.me].orientation == 'west' then
-            stats.update_move(false,{1,2,3,4,6,7,8,9,10,12,13,14,15,17})                    --+ 5|neg_x - 11|west - 16|forward
+            stats.update_move(false,{1,2,3,4,6,7,8,9,10,12,13,14,15,17})                    --+ move - 5|neg_x - 11|west - 16|forward
         end
-        stats.update_vars(false,{1,2,3,4,5,7,8,9,10,11,12})                                 --+ 6|forward
     elseif direction == 'back' then
         bump = status.bumps[status.pcTable[status.me].orientation]
         status.pcTable[status.me].location = {x = status.pcTable[status.me].location.x - bump[1], y = status.pcTable[status.me].location.y - bump[2], z = status.pcTable[status.me].location.z - bump[3]}
         if status.pcTable[status.me].orientation == 'north' then
-            stats.update_move(false,{1,2,3,5,6,7,8,10,11,12,13,14,15,16})                   --* 4|pos_z - 9|south - 17|back
+            stats.update_move(false,{1,2,3,5,6,7,8,10,11,12,13,14,15,16})                   --+ move - 4|pos_z - 9|south - 17|back
         elseif status.pcTable[status.me].orientation == 'south' then
-            stats.update_move(false,{1,2,3,4,5,6,9,10,11,12,13,14,15,16})                   --* 7|neg_z - 8|north - 17|back
+            stats.update_move(false,{1,2,3,4,5,6,9,10,11,12,13,14,15,16})                   --+ move - 7|neg_z - 8|north - 17|back
         elseif status.pcTable[status.me].orientation == 'east' then
-            stats.update_move(false,{1,2,3,4,6,7,8,9,10,12,13,14,15,16})                    --* 5|neg_x - 11|west - 17|back
+            stats.update_move(false,{1,2,3,4,6,7,8,9,10,12,13,14,15,16})                    --+ move - 5|neg_x - 11|west - 17|back
         elseif status.pcTable[status.me].orientation == 'west' then
-            stats.update_move(false,{1,3,4,5,6,7,8,9,11,12,13,14,15,16})                    --* 2|pos_x - 10|east - 17|back
+            stats.update_move(false,{1,3,4,5,6,7,8,9,11,12,13,14,15,16})                    --+ move - 2|pos_x - 10|east - 17|back
         end
     elseif direction == 'left' then
         status.pcTable[status.me].orientation = status.left_shift[status.pcTable[status.me].orientation]
-        stats.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17})                   --* 14|left
+        stats.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17})                   --+ move - 14|left
     elseif direction == 'right' then
         status.pcTable[status.me].orientation = status.right_shift[status.pcTable[status.me].orientation]
-        stats.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17})                   --+ 15|right
+        stats.update_move(false,{1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17})                   --* move - 15|right
     end
-    stats.update_move(false,{2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17})                      --+ 1|total
-    stats.update_vars(false,{1,2,3,4,5,6})                                                  --* 7,8,9|larg_x,y,z - 10,11,12|smal_x,y,z
+    stats.update_move(false,{2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17})                      --* move - 1|total
+    stats.update_vars(false,{1,2})                                                          --+ vars - 3,4,5|larg_x,y,z - 6,7,8|smal_x,y,z
     return true
 end
 function go_to(end_location, end_orientation, path)
-    stats.clear_all_stats()
+    --- (move,detect,vars,go,static,dynmc,fwd,up,dwn,lft,rit,bck)
+    stats.clear_all_stats(1,1,1,1,1,0,0,0,0,0,0,0)                                          --* 1 = on | 0 = off
     sleep(2)
     stats.update_static(end_location, path, false, {})
     stats.first_min_max_xyz()
@@ -139,20 +137,20 @@ function go_to_axis(axis)
 end
 function go(direction)
     if (direction == 'forward' and status.detect[direction]()) then
-        stats.update_detect(false,{2,3})                                                    --* 1|total - 4|forward
-        stats.update_vars(false,{1,3,4,5,6,7,8,9,10,11,12})                                 --+ 2|fls
+        stats.update_detect(false,{2,3})                                                    --* detect - 1|total - 4|forward
+        stats.update_vars(false,{1,3,4,5,6,7,8})                                            --+ vars - 2|fls
         return false
     elseif (direction == 'up' and status.detect[direction]()) then
-        stats.update_detect(false,{3,4})                                                    --* 1|total - 2|up
-        stats.update_vars(false,{1,3,4,5,6,7,8,9,10,11,12})                                 --+ 2|fls
+        stats.update_detect(false,{3,4})                                                    --* detect - 1|total - 2|up
+        stats.update_vars(false,{1,3,4,5,6,7,8})                                            --+ vars - 2|fls
         return false
     elseif (direction == 'down' and status.detect[direction]()) then
-        stats.update_detect(false,{2,4})                                                    --* 1|total - 3|down
-        stats.update_vars(false,{1,3,4,5,6,7,8,9,10,11,12})                                 --+ 2|fls
+        stats.update_detect(false,{2,4})                                                    --* detect - 1|total - 3|down
+        stats.update_vars(false,{1,3,4,5,6,7,8})                                            --+ vars - 2|fls
         return false
     end
     move.move_log(direction)
-    stats.update_vars(false,{2,4,5,6,7,8,9,10,11,12})                                       --+ 1|tru - 3|go
+    stats.update_vars(false,{2,3,4,5,6,7,8})                                                --+ vars - 1|tru
     return true
 end
 -- section for checking directings if forward is blocked
