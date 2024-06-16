@@ -73,6 +73,17 @@ going = {
             left = 0,
             right = 0,
         },
+        --| Catching all of the face calls.
+                --- needed to add this section seperately since face is a very distinct operation
+                --- even though we have means to determine how we are moving, face calls are needed for comparison
+        face = {
+            key_order = {"face","north","south","east","west"},
+            face = 0,
+            north = 0,
+            south = 0,
+            east = 0,
+            west = 0,
+        },
     },
 --                                                                                                                                                 <>
     --| This is the variable key for what a variable means. It's allowed to be called
@@ -112,40 +123,41 @@ going = {
             --- key order is to allow us to work in the correct order in a for loop
         key_order = {"sloc","eloc","sloc_nav","sloc_nav_abs","eloc_nav","eloc_nav_abs","nav_priority_input","sdir","edir"},
             --- starting location xyz
-        sloc = nil,                                         --+ positive and negative xyz
+        sloc = nil,                                         --* positive and negative xyz
             --- end locaiton xyz
-        eloc = nil,                                         --+ positive and negative xyz
+        eloc = nil,                                         --* positive and negative xyz
             --- optimal pathing that the turtle records on start
             --- strtloc optimal is the xyz turtle thinks it needs to go
             --- strtloc optimal abs is the absolute the turtle thinks it needs to go.
-        sloc_nav = nil,                                     --+ positive and negative xyz
-        sloc_nav_abs = nil,                                 --* absolute value of distance
+        sloc_nav = nil,                                     --* positive and negative xyz
+        sloc_nav_abs = nil,                                 --+ absolute value of distance
             --- endloc optimal is the xyz distance to be traveled from the perspective of the end destination
             --- endloc optimal abs is the absolute value the end thinks the turtle should go
-        eloc_nav = nil,                                     --+ positive and negative xyz
-        eloc_nav_abs = nil,                                 --* absolute value of distance
+        eloc_nav = nil,                                     --* positive and negative xyz
+        eloc_nav_abs = nil,                                 --+ absolute value of distance
             --- storing strings for the nav priority and the compass directions
-        nav_priority_input = nil,                           --* STRING
+        nav_priority_input = nil,                           --+ STRING
             --- cardinal direction start to end
             --- cardinal direction end to start
-        sdir = nil,                                         --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
-        edir = nil                                          --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        sdir = nil,                                         --* STRING ex cardinal_direc = { x = 'east', z = 'north'}
+        edir = nil                                          --+ STRING ex cardinal_direc = { x = 'east', z = 'north'}
     },
 --                                                                                                                                                 <>
     --| Mapping the dynamic distance for the turtle movement directly. This is outside of the Maze solver
     dynmc = {
             --- key order is to allow us to work in the correct order in a for loop
-        key_order = {"slocn","slocn_nav","slocn_nav_abs","elocn","elocn_nav","elocn_nav_abs","nav","nav_abs","dirn","sdirn","edirn","axisn"},
+        key_order = {"slocn","elocn","slocn_nav","slocn_nav_abs","elocn_nav","elocn_nav_abs","nav","nav_abs","dirn","sdirn","edirn","axisn"},
             --- This is to record the where in the world we are. sanity check against the API "status.pctable[who_am_i.my_id].location"
+            --- This is where we THINK the end location is from our perspective
+            --- Even if we already mapped the static value, we can't know for certain that we are still on the right path
+        slocn = nil,                                        --+ positive and negative xyz
+        elocn = nil,                                        --* positive and negative xyz
             --- now dist is the xyz of the distance from right now to the end. sanity check against static
             --- now dist abs is the distance we have left to go to get to the end position.
-        slocn = nil,                                        --* positive and negative xyz
         slocn_nav = nil,                                    --+ positive and negative xyz
         slocn_nav_abs = nil,                                --* absolute value of distance
-            --- this records where the end location is. Use to sanity check against the end location static. 
             --- now dist is where we THINK the end destination is. Used as sanity check to compare against static.
             --- now dist abs is the absolute of how far away we are from the end destination. Used as comparison for sanity check
-        elocn = nil,                                        --* positive and negative xyz
         elocn_nav = nil,                                    --+ positive and negative xyz
         elocn_nav_abs = nil,                                --* absolute value of distance
             --- Tracking the actual movement the turle has made. 
@@ -505,9 +517,9 @@ end
 --| I need an easier way to adjust the clear all
 --| Since it defines how we record data to the log
 --                                                                                                                                                 <>
---- stats.clear_all_stats(1,1,1,1,1,1,1,1,1,1,1,1)
---- stats.clear_all_stats(0,0,0,0,0,0,0,0,0,0,0,0)
-function clear_all_stats(move,detect,vars,go,static,dynmc,fwd,up,dwn,lft,rit,bck)
+--- stats.clear_all_stats(1,1,1,1,1,1,1,1,1,1,1,1,1)
+--- stats.clear_all_stats(0,0,0,0,0,0,0,0,0,0,0,0,0)
+function clear_all_stats(move,detect,vars,go,face,static,dynmc,fwd,up,dwn,lft,rit,bck)
     if move == 1 then
         local skp = {}
         if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
@@ -574,6 +586,18 @@ function clear_all_stats(move,detect,vars,go,static,dynmc,fwd,up,dwn,lft,rit,bck
         }
         for _, func in ipairs(updates) do func() end
     end
+    if face == 1 then
+        local function setAndUpdate(key, value) stats.going.stats.face[key] = value; stats.updateStateStatsValue("stats_face_" .. key, value) end
+        local key_order = stats.going.stats.face.key_order
+        local updates = {
+            function() setAndUpdate(key_order[1], 0) end,
+            function() setAndUpdate(key_order[2], 0) end,
+            function() setAndUpdate(key_order[3], 0) end,
+            function() setAndUpdate(key_order[4], 0) end,
+            function() setAndUpdate(key_order[5], 0) end,
+        }
+        for _, func in ipairs(updates) do func() end
+    end
     if static == 1 then
         local function setAndUpdate(key, value) stats.going.static[key] = value stats.updateStateStatsValue("static_" .. key, value) end
         local key_order = stats.going.static.key_order
@@ -595,9 +619,9 @@ function clear_all_stats(move,detect,vars,go,static,dynmc,fwd,up,dwn,lft,rit,bck
         local key_order = stats.going.dynmc.key_order
         local updates = {
             function() setAndUpdate(key_order[1], nil) end,
-            function() setAndUpdate(key_order[2], {x = nil, y = nil, z = nil}) end,
+            function() setAndUpdate(key_order[2], nil) end,
             function() setAndUpdate(key_order[3], {x = nil, y = nil, z = nil}) end,
-            function() setAndUpdate(key_order[4], nil) end,
+            function() setAndUpdate(key_order[4], {x = nil, y = nil, z = nil}) end,
             function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
             function() setAndUpdate(key_order[6], {x = nil, y = nil, z = nil}) end,
             function() setAndUpdate(key_order[7], {x = nil, y = nil, z = nil}) end,
@@ -977,6 +1001,22 @@ function update_go(print, skp_lst)
     for i, func in ipairs(updates) do if not skp[i] then func() end end
     if print then stats.print_going_status('stats.go') end
 end
+function update_face(print, skp_lst)
+    -- stats.update_face(false,{1,2,3,4,5})
+    local skp = {}
+    if skp_lst then for _, i in ipairs(skp_lst) do skp[i] = true end end
+    local function setAndUpdate(key, value) stats.going.stats.face[key] = value; stats.updateStateStatsValue("stats_face_" .. key, value) end
+    local key_order = stats.going.stats.face.key_order
+    local updates = {
+        function() setAndUpdate(key_order[1], stats.going.stats.face.face + 1) end,         --+ 1|face
+        function() setAndUpdate(key_order[2], stats.going.stats.face.north + 1) end,        --* 2|north
+        function() setAndUpdate(key_order[3], stats.going.stats.face.south + 1) end,        --+ 3|south
+        function() setAndUpdate(key_order[4], stats.going.stats.face.east + 1) end,         --* 4|east
+        function() setAndUpdate(key_order[5], stats.going.stats.face.west + 1) end,         --+ 5|west
+    }
+    for i, func in ipairs(updates) do if not skp[i] then func() end end
+    if print then stats.print_going_status('stats.face') end
+end
 function update_static(end_loc, path, print, skp_lst)
     -- stats.update_static(false,{1,2,3,4,5,6,7,8,9})
     local skp = {}
@@ -1015,12 +1055,12 @@ function update_dynmc(print, skp_lst)
     local updates = {
         --- slocn
         function() setAndUpdate(key_order[1], status.pcTable[status.me].location) end,
-        --- slocn_nav
-        function() setAndUpdate(key_order[2], {x = nil, y = nil, z = nil}) end,
-        --- slocn_nav_abs
-        function() setAndUpdate(key_order[3], {x = nil, y = nil, z = nil}) end,
         --- elocn
-        function() setAndUpdate(key_order[4], nil) end,
+        function() setAndUpdate(key_order[2], nil) end,
+        --- slocn_nav
+        function() setAndUpdate(key_order[3], {x = nil, y = nil, z = nil}) end,
+        --- slocn_nav_abs
+        function() setAndUpdate(key_order[4], {x = nil, y = nil, z = nil}) end,
         --- elocn_nav
         function() setAndUpdate(key_order[5], {x = nil, y = nil, z = nil}) end,
         --- elocn_nav_abs
